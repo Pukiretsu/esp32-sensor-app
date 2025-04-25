@@ -108,7 +108,7 @@ $(document).ready(function () {
           // Remover clase de resaltado después de 3 segundos
           setTimeout(() => {
             fila.removeClass('new-row');
-          }, 3000);
+          }, 5000);
         }
       });
     });
@@ -122,10 +122,10 @@ $(document).ready(function () {
     if (!intervalo) {
       if (contenedorId === 'logs-table') {
         actualizarTablaLogs(); // primer fetch
-        intervalo = setInterval(actualizarTablaLogs, 1000);
+        intervalo = setInterval(actualizarTablaLogs, 10000);
       } else if (contenedorId === 'sensor-table') {
         actualizarTablaSensores(); // primer fetch
-        intervalo = setInterval(actualizarTablaSensores, 5000);
+        intervalo = setInterval(actualizarTablaSensores, 10000);
       }
     }
   }
@@ -234,5 +234,82 @@ $(document).ready(function () {
         }
       });
     }
+  });
+
+  $('#refresh-logs-btn').on('click', function () {
+    actualizarTablaLogs();
+    alert("actualizando logs")
+  });
+
+  $('#refresh-sensor-btn').on('click', function () {
+    actualizarTablaSensores();
+    alert("actualizando sensores")
+  });
+  // Función para convertir datos a CSV
+  function convertToCSV(data, isLogs = true) {
+    const headers = isLogs
+      ? ['ID', 'Fecha', 'Hora', 'Tag', 'Evento']
+      : ['ID', 'Hora', 'Fecha', 'Sensor', 'Temperatura', 'Humedad'];
+
+    const rows = data.map(item => {
+      if (isLogs) {
+        return [
+          item.id,
+          item.fecha,
+          time_utc_to_local(item.hora),
+          `"${item.tag.replace(/"/g, '""')}"`,
+          `"${item.evento.replace(/"/g, '""')}"`
+        ].join(',');
+      } else {
+        return [
+          item.id,
+          time_utc_to_local(item.hora),
+          item.fecha,
+          item.tipo,
+          item.temperatura,
+          item.humedad
+        ].join(',');
+      }
+    });
+
+    return [headers.join(','), ...rows].join('\n');
+  }
+
+  // Función para descargar el archivo CSV
+  function downloadCSV(csvData, filename) {
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // Manejadores para los botones de exportación
+  $('#export-logs-btn').on('click', function () {
+    $.get(API_ADDR + '/logs', function (data) {
+      if (data.length > 0) {
+        const csvData = convertToCSV(data, true);
+        downloadCSV(csvData, `logs_secador_solar_${new Date().toISOString().slice(0, 10)}.csv`);
+      } else {
+        alert('No hay datos de logs para exportar');
+      }
+    });
+  });
+
+  $('#export-sensor-btn').on('click', function () {
+    $.get(API_ADDR + '/sensor', function (data) {
+      if (data.length > 0) {
+        const csvData = convertToCSV(data, false);
+        downloadCSV(csvData, `sensores_secador_solar_${new Date().toISOString().slice(0, 10)}.csv`);
+      } else {
+        alert('No hay datos de sensores para exportar');
+      }
+    });
   });
 });

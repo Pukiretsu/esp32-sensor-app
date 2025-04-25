@@ -98,18 +98,38 @@
             </div>
         </div>
 
-        <div class="section" id="sensor-section">
-            <h2>Datos del Sensor</h2>
-            <div id="sensor-table"></div> <!-- Aquí se cargará la tabla de los sensores -->
-        </div>
-
         <div class="section" id="logs-section">
-            <h2>Logs</h2>
+            <h2>Mensajes del sistema (Logs)</h2>
+            <div class="table-controls">
+                <button id="refresh-logs-btn" class="btn btn-primary">
+                    <span class="material-symbols-outlined">refresh</span>
+                    <span>Refrescar</span>
+                </button>
+                <button id="export-logs-btn" class="btn btn-success">
+                    <span class="material-symbols-outlined">Download</span>
+                    <span>Descargar .csv</span>
+                </button>
+            </div>
             <div id="logs-table"></div> <!-- Aquí se cargará la tabla de logs -->
         </div>
 
+        <div class="section" id="sensor-section">
+            <h2>Datos del Sensor DHT11</h2>
+            <div class="table-controls">
+                <button id="refresh-sensor-btn" class="btn btn-primary">
+                    <span class="material-symbols-outlined">refresh</span>
+                    <span>Refrescar</span>
+                </button>
+                <button id="export-sensor-btn" class="btn btn-success">
+                    <span class="material-symbols-outlined">Download</span>
+                    <span>Descargar .csv</span>
+                </button>
+            </div>
+            <div id="sensor-table"></div> <!-- Aquí se cargará la tabla de los sensores -->
+        </div>
+
         <div class="section" id="acerca-section">
-        
+
             <h2 class="about-title">Quienes somos?</h2>
 
             <!-- Tarjetas del equipo -->
@@ -161,28 +181,28 @@
             <div class="tech-summary">
                 <h3 class="section-subtitle">Tecnologías utilizadas</h3>
                 <div class="tech-cards">
-                  <div class="tech-item">
-                    <span class="material-symbols-outlined tech-icon">code</span>
-                    <h4>Rust</h4>
-                    <p>Lenguaje principal del backend, elegido por su velocidad y seguridad.</p>
-                  </div>
-                  <div class="tech-item">
-                    <span class="material-symbols-outlined tech-icon">database</span>
-                    <h4>PostgreSQL</h4>
-                    <p>Base de datos relacional robusta para almacenar datos de sensores.</p>
-                  </div>
-                  <div class="tech-item">
-                    <span class="material-symbols-outlined tech-icon">extension</span>
-                    <h4>jQuery</h4>
-                    <p>Librería ligera para manejar la interactividad del frontend.</p>
-                  </div>
-                  <div class="tech-item">
-                    <span class="material-symbols-outlined tech-icon">cloud</span>
-                    <h4>Docker</h4>
-                    <p>Contenedores para facilitar el despliegue del sistema completo.</p>
-                  </div>
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">code</span>
+                        <h4>Rust</h4>
+                        <p>Lenguaje principal del backend, elegido por su velocidad y seguridad.</p>
+                    </div>
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">database</span>
+                        <h4>PostgreSQL</h4>
+                        <p>Base de datos relacional robusta para almacenar datos de sensores.</p>
+                    </div>
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">extension</span>
+                        <h4>jQuery</h4>
+                        <p>Librería ligera para manejar la interactividad del frontend.</p>
+                    </div>
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">cloud</span>
+                        <h4>Docker</h4>
+                        <p>Contenedores para facilitar el despliegue del sistema completo.</p>
+                    </div>
                 </div>
-              </div>
+            </div>
         </div>
     </div>
 
