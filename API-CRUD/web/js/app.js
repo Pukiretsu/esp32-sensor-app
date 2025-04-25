@@ -1,5 +1,5 @@
 // scripts.js
-const API_ADDR = "http://127.0.0.1:8080"
+const API_ADDR = "https://api.secador-solar-gia.online"
 $(document).ready(function () {
   // Mostrar la sección de Inicio por defecto
   $('#inicio-section').addClass('active');
