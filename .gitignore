@@ -6,11 +6,11 @@ docker-compose.yml
 .env.*
 
 # === Rust ===
-API-CRUD/target/
-API-CRUD/docker-compose.yml
+SERVER/target
+SERVER/docker-compose.yml
 **/*.rs.bk
 **/*.rs.bak
-API-CRUD/Cargo.lock  # Keep this if it's a binary project, remove if it's a library
+SERVER/Cargo.lock  # Keep this if it's a binary project, remove if it's a library
 
 # === Python ===
 __pycache__/

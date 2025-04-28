@@ -15,10 +15,10 @@ Este proyecto integra diferentes componentes para capturar, almacenar y visualiz
 ## 🗂️ Estructura del Repositorio
 
 ```bash
--
-├── SERVER/             # Código fuente de la API en Rust
-├──-- src/            # Página web estática para visualización
-├──-- web/            # Página web estática para visualización
-├──-- docker-compose.yml
-├── .env.example        # Variables de entorno de ejemplo
-└── README.md
+
+├── MICROCONTROLLER/        # Código fuente para el esp-32 para compilar con el arduino ide
+├── SERVER/                 # Código fuente de la API en Rust
+├──── src/                  # Página web estática para visualización
+├──── web/                  # Página web estática para visualización
+├──── docker-compose.yml
+└── README.md   

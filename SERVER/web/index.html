@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secador Solar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- Barra de Navegación -->
+    <div class="navbar">
+        <a href="#" class="nav-item" id="inicio-link">
+            <span class="material-symbols-outlined">home</span>
+            <span class="nav-text">Inicio</span>
+        </a>
+        <a href="#" class="nav-item" id="sensor-link">
+            <span class="material-symbols-outlined">sensors</span>
+            <span class="nav-text">Datos Sensor</span>
+        </a>
+        <a href="#" class="nav-item" id="logs-link">
+            <span class="material-symbols-outlined">list_alt</span>
+            <span class="nav-text">Logs</span>
+        </a>
+        <a href="#" class="nav-item" id="acerca-link">
+            <span class="material-symbols-outlined">info</span>
+            <span class="nav-text">Acerca de</span>
+        </a>
+    </div>
+
+    <!-- Contenido -->
+    <div class="content">
+        <div class="section active" id="inicio-section">
+            <div class="section-header">
+                <img src="images/gia-logo.png" alt="Logo del proyecto" class="section-logo" />
+            </div>
+            <h2>Automatización Secador Solar</h2>
+            <p>Este sistema automatiza la toma de datos de un secador solar usando sensores DHT11 conectados a ESP32.
+            </p>
+
+            <!-- Lecturas rápidas -->
+            <div class="sensor-cards">
+                <div class="sensor-card">
+                    <span class="material-symbols-outlined sensor-icon"> cancel </span>
+                    <h3>Estado ESP32</h3>
+                    <p>Inactivo</p>
+                </div>
+
+                <div class="sensor-card">
+                    <span class="material-symbols-outlined sensor-icon">device_thermostat</span>
+                    <h3>Temperatura</h3>
+                    <p>- °C</p>
+                </div>
+
+                <div class="sensor-card">
+                    <span class="material-symbols-outlined sensor-icon">humidity_percentage</span>
+                    <h3>Humedad</h3>
+                    <p>- %</p>
+                </div>
+            </div>
+
+            <!-- Estado del Proyecto -->
+            <h3>Estado del Proyecto</h3>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 26%;">26%</div>
+            </div>
+
+            <!-- Hitos -->
+            <h3>Hitos del Proyecto</h3>
+            <ul class="timeline">
+                <li><strong>Feb 2025:</strong> Diseño del prototipo</li>
+                <li><strong>Mar 2025:</strong> Integración de sensores ESP32</li>
+                <li><strong>Abr 2025:</strong> Desarrollo de la interfaz web</li>
+                <li><strong>Actualidad:</strong> Pruebas de monitoreo en tiempo real</li>
+            </ul>
+
+            <div class="prototype-gallery">
+
+                <div class="prototype-card">
+                    <img src="images/Prototipo.webp" alt="Prototipo 1">
+                    <div class="prototype-info">
+                        <h3>Prototipo Secador Solar</h3>
+                        <p>Estructura base recolector solar y primeros sensores instalados.</p>
+                    </div>
+                </div>
+
+                <div class="prototype-card">
+                    <img src="images/montaje.webp" alt="montaje 2">
+                    <div class="prototype-info">
+                        <h3>Montaje ESP32 </h3>
+                        <p>Montaje en breadboard del circuito para tomar datos con el esp32.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section" id="logs-section">
+            <h2>Mensajes del sistema (Logs)</h2>
+            <div class="table-controls">
+                <button id="refresh-logs-btn" class="btn btn-primary">
+                    <span class="material-symbols-outlined">refresh</span>
+                    <span>Refrescar</span>
+                </button>
+                <button id="export-logs-btn" class="btn btn-success">
+                    <span class="material-symbols-outlined">Download</span>
+                    <span>Descargar .csv</span>
+                </button>
+            </div>
+            <div id="logs-table"></div> <!-- Aquí se cargará la tabla de logs -->
+        </div>
+
+        <div class="section" id="sensor-section">
+            <h2>Datos del Sensor DHT11</h2>
+            <div class="table-controls">
+                <button id="refresh-sensor-btn" class="btn btn-primary">
+                    <span class="material-symbols-outlined">refresh</span>
+                    <span>Refrescar</span>
+                </button>
+                <button id="export-sensor-btn" class="btn btn-success">
+                    <span class="material-symbols-outlined">Download</span>
+                    <span>Descargar .csv</span>
+                </button>
+            </div>
+            <div id="sensor-table"></div> <!-- Aquí se cargará la tabla de los sensores -->
+        </div>
+
+        <div class="section" id="acerca-section">
+
+            <h2 class="about-title">Quienes somos?</h2>
+
+            <!-- Tarjetas del equipo -->
+            <div class="team-grid">
+                <div class="team-card">
+                    <img src="images/angie_hurtado.jpeg" alt="Angie Katherine Hurtado Montañez">
+                    <h3>Angie Katherine Hurtado Montañez</h3>
+                    <p>Ingeniera agrícola en formación </p>
+                    <div class="social-links">
+                        <a href="http://linkedin.com/in/angiekatherinehurtadomontanez" target="_blank" title="LinkedIn">
+                            <span class="material-symbols-outlined">account_circle</span>
+                        </a>
+                        <a href="mailto:correo1@ejemplo.edu.co" title="Correo">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="images/jhonny_patino.jpeg" alt="Jhony Javier Patiño Alvira">
+                    <h3>Jhony Javier Patiño Alvira</h3>
+                    <p>Ingeniero agrícola en formación </p>
+                    <div class="social-links">
+                        <a href="http://www.linkedin.com/in/jhonypatinoalvira" target="_blank">
+                            <span class="material-symbols-outlined">account_circle</span>
+                        </a>
+                        <a href="mailto:correo2@ejemplo.edu.co">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="team-card">
+                    <img src="images/angel_gonzalez.jpeg" alt="Angel Leonardo Gonzalez Padilla">
+                    <h3>Angel Leonardo Gonzalez Padilla</h3>
+                    <p>Ingeniero agrícola en formación </p>
+                    <div class="social-links">
+                        <a href="https://linkedin.com/in/angonzalezpa/" target="_blank">
+                            <span class="material-symbols-outlined">account_circle</span>
+                        </a>
+                        <a href="mailto:correo3@ejemplo.edu.co">
+                            <span class="material-symbols-outlined">mail</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta del stack tecnológico -->
+            <div class="tech-summary">
+                <h3 class="section-subtitle">Tecnologías utilizadas</h3>
+                <div class="tech-cards">
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">code</span>
+                        <h4>Rust</h4>
+                        <p>Lenguaje principal del backend, elegido por su velocidad y seguridad.</p>
+                    </div>
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">database</span>
+                        <h4>PostgreSQL</h4>
+                        <p>Base de datos relacional robusta para almacenar datos de sensores.</p>
+                    </div>
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">extension</span>
+                        <h4>jQuery</h4>
+                        <p>Librería ligera para manejar la interactividad del frontend.</p>
+                    </div>
+                    <div class="tech-item">
+                        <span class="material-symbols-outlined tech-icon">cloud</span>
+                        <h4>Docker</h4>
+                        <p>Contenedores para facilitar el despliegue del sistema completo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="js/app.js"></script>
+    <div class="footer">
+        &copy; 2025 Secador Solar GIA - Todos los derechos reservados
+    </div>
+</body>
+
+</html>
