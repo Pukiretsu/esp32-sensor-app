@@ -642,7 +642,7 @@ fn set_database() -> Result<(), PostgresError> {
             CREATE TABLE IF NOT EXISTS status (
                 id SERIAL PRIMARY KEY,
                 stat VARCHAR(20) NOT NULL,
-                battery INTEGER NOT NULL,
+                battery INTEGER NOT NULL
             );",
     )?;
 
