@@ -706,6 +706,7 @@ fn get_sensor_vec_request_body(request: &str) -> Result<Vec<Sensor>, serde_json:
 }
 
 fn get_log_request_body(request: &str) -> Result<Log, serde_json::Error> {
+    println!("{}", &request);
     serde_json::from_str(request.split("\r\n\r\n").last().unwrap_or_default())
 }
 
