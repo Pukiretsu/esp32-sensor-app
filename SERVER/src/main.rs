@@ -239,8 +239,9 @@ fn handle_post_sensor_request(request: &str) -> String {
 
             build_ok_response("Entrada del sensor creada con exito")
         }
-        (Err(_dht11_entry), Ok(_client)) => {
-            build_bad_request_response("Verifica la estructura de la petición")
+        (Err(e), Ok(_client)) => {
+            eprint!("Error con el dht11: {}", &e);
+            build_bad_request_response(&format!("Verifica la estructura de la petición \nerror: {}", e))
         }
 
         _ => build_internal_error_response("Error no se creo la entrada del sensor"),
@@ -262,8 +263,9 @@ fn handle_post_sensors_request(request: &str) -> String {
 
             build_ok_response("Entrada del sensor creada con exito")
         }
-        (Err(_dht11_entry), Ok(_client)) => {
-            build_bad_request_response("Verifica la estructura de la petición")
+        (Err(e), Ok(_client)) => {
+            eprint!("Error posteando dht's: {}", &e);
+            build_bad_request_response(&format!("Verifica la estructura de la petición \nerror: {}", e))
         }
 
         _ => build_internal_error_response("Error no se creo la entrada del sensor"),
@@ -286,8 +288,9 @@ fn handle_post_log_request(request: &str) -> String {
             build_ok_response("Entrada del sensor creada con exito")
         }
 
-        (Err(_log_entry), Ok(_client)) => {
-            build_bad_request_response("Verifica la estructura de la petición")
+        (Err(e), Ok(_client)) => {
+            eprint!("Error con el log: {}", &e);
+            build_bad_request_response(&format!("Verifica la estructura de la petición \nerror: {}", e))
         }
 
         _ => build_internal_error_response("Error no se creo la entrada del sensor"),
@@ -310,8 +313,9 @@ fn handle_post_status_request(request: &str) -> String {
             build_ok_response("Entrada del sensor creada con exito")
         }
 
-        (Err(_log_entry), Ok(_client)) => {
-            build_bad_request_response("Verifica la estructura de la petición")
+        (Err(e), Ok(_client)) => {
+            eprint!("Error con el status: {}", &e);
+            build_bad_request_response(&format!("Verifica la estructura de la petición \nerror: {}", e))
         }
 
         _ => build_internal_error_response("Error no se creo la entrada del sensor"),
@@ -326,8 +330,6 @@ fn handle_get_sensor_request(request: &str) -> String {
         Client::connect(DB_URL, NoTls),
     ) {
         (Ok(id), Ok(mut client)) => {
-            // si no funciona implementando crono voler la fecha un <string> y en el query poner
-            // TO_CHAR(fecha, 'DD/MM/YYYY') as fecha
             match client.query_one(
                 "SELECT id, tipo, temperatura, humedad, fecha, hora FROM dht11_data WHERE id = $1",
                 &[&id],
@@ -348,9 +350,11 @@ fn handle_get_sensor_request(request: &str) -> String {
             }
         }
 
-        (Err(_id), Ok(_client)) => {
-            build_bad_request_response("Verifica la estructura de la petición")
+        (Err(e), Ok(_client)) => {
+            eprint!("Error con el status: {}", &e);
+            build_bad_request_response(&format!("Verifica la estructura de la petición \nerror: {}", e))
         }
+
 
         _ => build_internal_error_response("Error"),
     }
@@ -380,8 +384,9 @@ fn handle_get_log_request(request: &str) -> String {
                 _ => build_not_found_response("Log no encontrado"),
             }
         }
-        (Err(_id), Ok(_client)) => {
-            build_bad_request_response("Verifica la estructura de la petición")
+        (Err(e), Ok(_client)) => {
+            eprint!("Error con el log: {}", &e);
+            build_bad_request_response(&format!("Verifica la estructura de la petición \nerror: {}", e))
         }
 
         _ => build_internal_error_response("Error"),
@@ -407,8 +412,9 @@ fn handle_get_status_request(request: &str) -> String {
                 _ => build_not_found_response("Status no encontrado"),
             }
         }
-        (Err(_id), Ok(_client)) => {
-            build_bad_request_response("Verifica la estructura de la petición")
+        (Err(e), Ok(_client)) => {
+            eprint!("Error con el status: {}", &e);
+            build_bad_request_response(&format!("Verifica la estructura de la petición \nerror: {}", e))
         }
 
         _ => build_internal_error_response("Error"),
@@ -488,7 +494,7 @@ fn handle_put_sensor_request(request: &str) -> String {
 
             build_ok_response("Entrada actualizada con exito")
         }
-        (Err(_id), Err(_dht11), Ok(_client)) => {
+        (Err(_parse_e), Err(_entry_e), Ok(_client)) => {
             build_bad_request_response("Verifica la estructura de la petición")
         }
 
@@ -518,9 +524,10 @@ fn handle_put_log_request(request: &str) -> String {
 
             build_ok_response("Entrada actualizada con exito")
         }
-        (Err(_id), Err(_log), Ok(_client)) => {
+        (Err(_parse_e), Err(_entry_e), Ok(_client)) => {
             build_bad_request_response("Verifica la estructura de la petición")
         }
+
 
         _ => build_internal_error_response("Error"),
     }
@@ -542,9 +549,10 @@ fn handle_put_status_request(request: &str) -> String {
 
             build_ok_response("Entrada actualizada con exito")
         }
-        (Err(_id), Err(_status), Ok(_client)) => {
+        (Err(_parse_e), Err(_entry_e), Ok(_client)) => {
             build_bad_request_response("Verifica la estructura de la petición")
         }
+
 
         _ => build_internal_error_response("Error"),
     }
