@@ -40,9 +40,88 @@ struct Status {
 //const DB_URL: &str = "postgres://admin:HATmik211@db:5432/sensor_log_db";
 const DB_URL: &str = env!("DATABASE_URL");
 
-// Constants for HTTP responses
+// functions for building HTTP responses
 
-const OK_RESPONSE: &str = "HTTP/1.1 200 OK\r\n\
+/// Respuesta 200 OK estándar con JSON y CORS
+fn build_ok_response(body: &str) -> String {
+    format!(
+        "HTTP/1.1 200 OK\r\n\
+         Access-Control-Allow-Origin: *\r\n\
+         Content-Type: application/json\r\n\
+         Content-Length: {}\r\n\
+         \r\n\
+         {}",
+        body.len(),
+        body
+    )
+}
+
+/// Respuesta para peticiones OPTIONS (CORS preflight)
+fn build_cors_ok_response() -> String {
+    format!(
+        "HTTP/1.1 200 OK\r\n\
+         Access-Control-Allow-Origin: *\r\n\
+         Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS\r\n\
+         Access-Control-Allow-Headers: Content-Type\r\n\
+         Content-Length: 0\r\n\
+         \r\n"
+    )
+}
+
+/// Respuesta 404 Not Found
+fn build_not_found_response(body: &str) -> String {
+    format!(
+        "HTTP/1.1 404 Not Found\r\n\
+         Content-Type: text/plain\r\n\
+         Content-Length: {}\r\n\
+         \r\n\
+         {}",
+        body.len(),
+        body
+    )
+}
+
+/// Respuesta 500 Internal Server Error
+fn build_internal_error_response(message: &str) -> String {
+    format!(
+        "HTTP/1.1 500 Internal Server Error\r\n\
+         Content-Type: text/plain\r\n\
+         Content-Length: {}\r\n\
+         \r\n\
+         {}",
+        message.len(),
+        message
+    )
+}
+
+/* /// Respuesta 401 Unauthorized con cabecera WWW-Authenticate
+fn build_unauthorized_response() -> String {
+    let body = "401 Unauthorized";
+    format!(
+        "HTTP/1.1 401 Unauthorized\r\n\
+         WWW-Authenticate: Basic realm=\"Restricted Area\"\r\n\
+         Content-Length: {}\r\n\
+         \r\n\
+         {}",
+        body.len(),
+        body
+    )
+} */
+
+/// Respuesta 400 Bad Request
+fn build_bad_request_response(message: &str) -> String {
+    format!(
+        "HTTP/1.1 400 Bad Request\r\n\
+         Content-Type: text/plain\r\n\
+         Content-Length: {}\r\n\
+         \r\n\
+         {}",
+        message.len(),
+        message
+    )
+}
+
+/* const OK_RESPONSE: &str = "HTTP/1.1 200 OK\r\n\
                            Access-Control-Allow-Origin: *\r\n\
                            Content-Type: application/json\r\n\r\n";
 
@@ -52,10 +131,13 @@ const OK_RESPONSE_CORS: &str = "HTTP/1.1 200 OK\r\n\
                        Access-Control-Allow-Headers: Content-Type\r\n\r\n";
 
 const NOT_FOUND: &str = "HTTP/1.1 404 NOT FOUND\r\n\r\n";
+
 const INTERNAL_SERVER_ERROR: &str = "HTTP/1.1 500 INTERNAL SERVER ERROR\r\n\r\n";
+
 const UNAUTHORIZED_ERROR: &str =
     "HTTP/1.1 401 Unauthorized\r\nWWW-Authenticate: Basic realm=\"Restricted Area\"\r\n\r\n";
-const BAD_REQUEST: &str = "HTTP/1.1 400 Bad Request\r\n\r\n";
+
+    const BAD_REQUEST: &str = "HTTP/1.1 400 Bad Request\r\n\r\n"; */
 // Main function
 
 fn main() {
@@ -85,79 +167,64 @@ fn main() {
 // handle_client function
 
 fn handle_client(mut stream: TcpStream) {
-    let mut buffer = [0; 1024];
+    let mut buffer = [0; 4096];
     let mut request = String::new();
 
     match stream.read(&mut buffer) {
-        Ok(size) => {
+        Ok(size) if size > 0 => {
             request.push_str(String::from_utf8_lossy(&buffer[..size]).as_ref());
+            println!("Petición recibida:\n{}", request);
 
-            // handle all CRUD requests
-            let (status_line, content) = match &*request {
-                // handle dht_11 related requests
-                r if r.starts_with("POST /sensor") => handle_post_sensor_request(r),
-                r if r.starts_with("GET /sensor/") => handle_get_sensor_request(r),
-                r if r.starts_with("GET /sensor") => handle_get_all_sensor_request(),
-                r if r.starts_with("PUT /sensor/") => handle_put_sensor_request(r),
-                r if r.starts_with("DELETE /sensor/") => handle_delete_sensor_request(r),
+            let response = route_request(&request);
 
-                // handle log related requests
-                r if r.starts_with("POST /log") => handle_post_log_request(r),
-                r if r.starts_with("GET /log/") => handle_get_log_request(r),
-                r if r.starts_with("GET /log") => handle_get_all_log_request(),
-                r if r.starts_with("PUT /log/") => handle_put_log_request(r),
-                r if r.starts_with("DELETE /log/") => handle_delete_log_request(r),
-
-                // handle status related requests
-                r if r.starts_with("POST /status") => handle_post_status_request(r),
-                //r if r.starts_with("GET /status/") => handle_get_status_request(r),
-                //r if r.starts_with("PUT /status/") => handle_put_status_request(r),
-                //r if r.starts_with("DELETE /status/") => handle_delete_status_request(r),
-
-                // handle web requests and be CORS compliant
-                r if r.starts_with("OPTIONS") => (OK_RESPONSE_CORS.to_string(), "".to_string()),
-
-                _ => (NOT_FOUND.to_string(), "404 Not Found".to_string()),
-            };
-
-            stream
-                .write_all(format!("{}{}", status_line, content).as_bytes())
-                .unwrap();
+            if let Err(e) = stream.write_all(response.as_bytes()) {
+                eprintln!("Error al enviar la respuesta: {}", e);
+            }
+        }
+        Ok(_) => {
+            eprintln!("Cliente cerró la conexión sin enviar datos.");
         }
         Err(e) => {
-            println!("Error: {}", e);
+            eprintln!("Error al leer del stream: {}", e);
         }
     }
 }
 
-// ------------ Controllers --------------------
+fn route_request(request: &str) -> String {
+    match request {
+        // Sensor routes
+        r if r.starts_with("POST /sensor") => handle_post_sensor_request(r),
+        r if r.starts_with("GET /sensor/") => handle_get_sensor_request(r),
+        r if r.starts_with("GET /sensor") => handle_get_all_sensor_request(),
+        r if r.starts_with("PUT /sensor/") => handle_put_sensor_request(r),
+        r if r.starts_with("DELETE /sensor/") => handle_delete_sensor_request(r),
 
-//POST
-//handle_post_request function template
-/*
-fn handle_post_request(request: &str) -> (String, String) {
-    match (
-        get_sensor_request_body(&request),
-        Client::connect(DB_URL, NoTls),
-    ) {
-        (Ok(Sensor), Ok(mut client)) => {
-            client
-                .execute(
-                    "INSERT INTO Sensors (titulo, contenido, estado) VALUES ($1, $2, $3)",
-                    &[&Sensor.titulo, &Sensor.contenido, &Sensor.estado],
-                )
-                .unwrap();
+        // Log routes
+        r if r.starts_with("POST /log") => handle_post_log_request(r),
+        r if r.starts_with("GET /log/") => handle_get_log_request(r),
+        r if r.starts_with("GET /log") => handle_get_all_log_request(),
+        r if r.starts_with("PUT /log/") => handle_put_log_request(r),
+        r if r.starts_with("DELETE /log/") => handle_delete_log_request(r),
 
-            (
-                OK_RESPONSE.to_string(),
-                "Tarea creada con exito".to_string(),
-            )
-        }
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        // Status routes
+        r if r.starts_with("POST /status") => handle_post_status_request(r),
+        r if r.starts_with("GET /status/") => handle_get_status_request(r),
+        r if r.starts_with("PUT /status/") => handle_put_status_request(r),
+        r if r.starts_with("DELETE /status/") => handle_delete_status_request(r),
+
+        // CORS preflight
+        r if r.starts_with("OPTIONS") => build_cors_ok_response(),
+
+        // Default 404
+        _ => build_not_found_response("404 Endpoint not found"),
     }
-}*/
+}
 
-fn handle_post_sensor_request(request: &str) -> (String, String) {
+// ------------ Controllers -----------------------------------------------------------------------------------------------------------------------------
+
+//handle_post_request functions -----------------------------------------------------------------------------------------------------------------
+
+fn handle_post_sensor_request(request: &str) -> String {
     match (
         get_sensor_request_body(&request),
         Client::connect(DB_URL, NoTls),
@@ -170,23 +237,40 @@ fn handle_post_sensor_request(request: &str) -> (String, String) {
                 )
                 .unwrap();
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada del sensor creada con exito".to_string(),
-            )
+            build_ok_response("Entrada del sensor creada con exito")
         }
-        (Err(_dht11_entry), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
-        _ => (
-            INTERNAL_SERVER_ERROR.to_string(),
-            "Error no se creo la entrada del sensor".to_string(),
-        ),
+        (Err(_dht11_entry), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
+
+        _ => build_internal_error_response("Error no se creo la entrada del sensor"),
     }
 }
 
-fn handle_post_log_request(request: &str) -> (String, String) {
+fn handle_post_sensors_request(request: &str) -> String {
+    match (
+        get_sensor_request_body(&request),
+        Client::connect(DB_URL, NoTls),
+    ) {
+        (Ok(dht11), Ok(mut client)) => {
+            client
+                .execute(
+                    "INSERT INTO dht11_data (tipo, temperatura, humedad) VALUES ($1, $2, $3)",
+                    &[&dht11.tipo, &dht11.temperatura, &dht11.humedad],
+                )
+                .unwrap();
+
+            build_ok_response("Entrada del sensor creada con exito")
+        }
+        (Err(_dht11_entry), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
+
+        _ => build_internal_error_response("Error no se creo la entrada del sensor"),
+    }
+}
+
+fn handle_post_log_request(request: &str) -> String {
     match (
         get_log_request_body(&request),
         Client::connect(DB_URL, NoTls),
@@ -199,25 +283,18 @@ fn handle_post_log_request(request: &str) -> (String, String) {
                 )
                 .unwrap();
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada del sensor creada con exito".to_string(),
-            )
+            build_ok_response("Entrada del sensor creada con exito")
         }
 
-        (Err(_log_entry), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
+        (Err(_log_entry), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
 
-        _ => (
-            INTERNAL_SERVER_ERROR.to_string(),
-            "Error no se creo la entrada del sensor".to_string(),
-        ),
+        _ => build_internal_error_response("Error no se creo la entrada del sensor"),
     }
 }
 
-fn handle_post_status_request(request: &str) -> (String, String) {
+fn handle_post_status_request(request: &str) -> String {
     match (
         get_status_request_body(&request),
         Client::connect(DB_URL, NoTls),
@@ -230,56 +307,20 @@ fn handle_post_status_request(request: &str) -> (String, String) {
                 )
                 .unwrap();
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada del sensor creada con exito".to_string(),
-            )
+            build_ok_response("Entrada del sensor creada con exito")
         }
 
-        (Err(_log_entry), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
+        (Err(_log_entry), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
 
-        _ => (
-            INTERNAL_SERVER_ERROR.to_string(),
-            "Error no se creo la entrada del sensor".to_string(),
-        ),
+        _ => build_internal_error_response("Error no se creo la entrada del sensor"),
     }
 }
 
-// handle_get_request function
-/*
-fn handle_get_request(request: &str) -> (String, String) {
-    match (
-        get_id(&request).parse::<i32>(),
-        Client::connect(DB_URL, NoTls),
-    ) {
-        (Ok(id), Ok(mut client)) => {
-            match client.query_one("SELECT id, titulo, contenido, estado, TO_CHAR(fecha,'DD/MM/YYYY') as fecha FROM Sensors WHERE id = $1", &[&id]) {
-                Ok(row) => {
-                    let sensor = Sensor {
-                        id: row.get(0),
-                        tipo: row.get(1),
-                        temperatura: row.get(2),
-                        humedad: row.get(3),
-                        fecha: row.get(4),
-                    };
+// handle_get_request function -----------------------------------------------------------------------------------------------------------------
 
-                    (
-                        OK_RESPONSE.to_string(),
-                        serde_json::to_string(&Sensor).unwrap(),
-                    )
-                }
-                _ => (NOT_FOUND.to_string(), "Tarea no encontrada".to_string()),
-            }
-        }
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
-    }
-}
-*/
-
-fn handle_get_sensor_request(request: &str) -> (String, String) {
+fn handle_get_sensor_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         Client::connect(DB_URL, NoTls),
@@ -301,25 +342,21 @@ fn handle_get_sensor_request(request: &str) -> (String, String) {
                         hora: row.get(5),
                     };
 
-                    (
-                        OK_RESPONSE.to_string(),
-                        serde_json::to_string(&dht11).unwrap(),
-                    )
+                    build_ok_response(&serde_json::to_string(&dht11).unwrap())
                 }
-                _ => (NOT_FOUND.to_string(), "Entrada no encontrada".to_string()),
+                _ => build_not_found_response("Entrada no encontrada"),
             }
         }
 
-        (Err(_id), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
+        (Err(_id), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
 
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        _ => build_internal_error_response("Error"),
     }
 }
 
-fn handle_get_log_request(request: &str) -> (String, String) {
+fn handle_get_log_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         Client::connect(DB_URL, NoTls),
@@ -338,32 +375,26 @@ fn handle_get_log_request(request: &str) -> (String, String) {
                         hora: row.get(4),
                     };
 
-                    (
-                        OK_RESPONSE.to_string(),
-                        serde_json::to_string(&log_entry).unwrap(),
-                    )
+                    build_ok_response(&serde_json::to_string(&log_entry).unwrap())
                 }
-                _ => (NOT_FOUND.to_string(), "Log no encontrado".to_string()),
+                _ => build_not_found_response("Log no encontrado"),
             }
         }
-        (Err(_id), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        (Err(_id), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
+
+        _ => build_internal_error_response("Error"),
     }
 }
 
-fn handle_get_status_request(request: &str) -> (String, String) {
+fn handle_get_status_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         Client::connect(DB_URL, NoTls),
     ) {
         (Ok(id), Ok(mut client)) => {
-            match client.query_one(
-                "SELECT id, stat, battery FROM status WHERE id = $1",
-                &[&id],
-            ) {
+            match client.query_one("SELECT id, stat, battery FROM status WHERE id = $1", &[&id]) {
                 Ok(row) => {
                     let status_entry = Status {
                         id: row.get(0),
@@ -371,51 +402,22 @@ fn handle_get_status_request(request: &str) -> (String, String) {
                         battery: row.get(2),
                     };
 
-                    (
-                        OK_RESPONSE.to_string(),
-                        serde_json::to_string(&status_entry).unwrap(),
-                    )
+                    build_ok_response(&serde_json::to_string(&status_entry).unwrap())
                 }
-                _ => (NOT_FOUND.to_string(), "Status no encontrado".to_string()),
+                _ => build_not_found_response("Status no encontrado"),
             }
         }
-        (Err(_id), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        (Err(_id), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
+
+        _ => build_internal_error_response("Error"),
     }
 }
 
+// handle_get_all_request function -----------------------------------------------------------------------------------------------------------------
 
-// handle_get_all_request function
-/*
-fn handle_get_all_request(request: &str) -> (String, String) {
-    match Client::connect(DB_URL, NoTls) {
-        Ok(mut client) => {
-            let mut Sensors = Vec::new();
-
-            for row in client.query("SELECT id, titulo, contenido, estado, TO_CHAR(fecha,'DD/MM/YYYY') as fecha FROM Sensors", &[]).unwrap() {
-                Sensors.push(Sensor {
-                    id: row.get(0),
-                    titulo: row.get(1),
-                    contenido: row.get(2),
-                    estado: row.get(3),
-                    fecha: row.get(4),
-                });
-            }
-
-            (
-                OK_RESPONSE.to_string(),
-                serde_json::to_string(&Sensors).unwrap(),
-            )
-        }
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
-    }
-}
-*/
-
-fn handle_get_all_sensor_request() -> (String, String) {
+fn handle_get_all_sensor_request() -> String {
     match Client::connect(DB_URL, NoTls) {
         Ok(mut client) => {
             let mut dht11s = Vec::new();
@@ -437,17 +439,14 @@ fn handle_get_all_sensor_request() -> (String, String) {
                 });
             }
 
-            (
-                OK_RESPONSE.to_string(),
-                serde_json::to_string(&dht11s).unwrap(),
-            )
+            build_ok_response(&serde_json::to_string(&dht11s).unwrap())
         }
 
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        _ => build_internal_error_response("Error"),
     }
 }
 
-fn handle_get_all_log_request() -> (String, String) {
+fn handle_get_all_log_request() -> String {
     match Client::connect(DB_URL, NoTls) {
         Ok(mut client) => {
             let mut dht11s = Vec::new();
@@ -465,42 +464,15 @@ fn handle_get_all_log_request() -> (String, String) {
                 });
             }
 
-            (
-                OK_RESPONSE.to_string(),
-                serde_json::to_string(&dht11s).unwrap(),
-            )
+            build_ok_response(&serde_json::to_string(&dht11s).unwrap())
         }
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        _ => build_internal_error_response("Error"),
     }
 }
 
-// handle_put_request function
-/*
-fn handle_put_request(request: &str) -> (String, String) {
-    match (
-        get_id(&request).parse::<i32>(),
-        get_Sensor_request_body(&request),
-        Client::connect(DB_URL, NoTls),
-    ) {
-        (Ok(id), Ok(Sensor), Ok(mut client)) => {
-            client
-                .execute(
-                    "UPDATE Sensors SET titulo = $1, contenido = $2, estado = $3 WHERE id = $4",
-                    &[&Sensor.titulo, &Sensor.contenido, &Sensor.estado, &id],
-                )
-                .unwrap();
+// handle_put_request function -----------------------------------------------------------------------------------------------------------------
 
-            (
-                OK_RESPONSE.to_string(),
-                "tarea actualizada con exito".to_string(),
-            )
-        }
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
-    }
-}
-*/
-
-fn handle_put_sensor_request(request: &str) -> (String, String) {
+fn handle_put_sensor_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         get_sensor_request_body(&request),
@@ -514,20 +486,17 @@ fn handle_put_sensor_request(request: &str) -> (String, String) {
                 )
                 .unwrap();
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada actualizada con exito".to_string(),
-            )
+            build_ok_response("Entrada actualizada con exito")
         }
-        (Err(_id), Err(_dht11), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        (Err(_id), Err(_dht11), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
+
+        _ => build_internal_error_response("Error"),
     }
 }
 
-fn handle_put_log_request(request: &str) -> (String, String) {
+fn handle_put_log_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         get_log_request_body(&request),
@@ -547,20 +516,17 @@ fn handle_put_log_request(request: &str) -> (String, String) {
                 )
                 .unwrap();
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada actualizada con exito".to_string(),
-            )
+            build_ok_response("Entrada actualizada con exito")
         }
-        (Err(_id), Err(_log), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        (Err(_id), Err(_log), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
+
+        _ => build_internal_error_response("Error"),
     }
 }
 
-fn handle_put_status_request(request: &str) -> (String, String) {
+fn handle_put_status_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         get_status_request_body(&request),
@@ -570,55 +536,23 @@ fn handle_put_status_request(request: &str) -> (String, String) {
             client
                 .execute(
                     "UPDATE status SET stat = $1, battery = $2 WHERE id = $3",
-                    &[
-                        &status_entry.stat,
-                        &status_entry.battery,
-                        &id,
-                    ],
+                    &[&status_entry.stat, &status_entry.battery, &id],
                 )
                 .unwrap();
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada actualizada con exito".to_string(),
-            )
+            build_ok_response("Entrada actualizada con exito")
         }
-        (Err(_id), Err(_status), Ok(_client)) => (
-            BAD_REQUEST.to_string(),
-            "Verifica la estructura de la petición".to_string(),
-        ),
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        (Err(_id), Err(_status), Ok(_client)) => {
+            build_bad_request_response("Verifica la estructura de la petición")
+        }
+
+        _ => build_internal_error_response("Error"),
     }
 }
 
-// handle_delete_request function
-/*
-fn handle_delete_request(request: &str) -> (String, String) {
-    match (
-        get_id(&request).parse::<i32>(),
-        Client::connect(DB_URL, NoTls),
-    ) {
-        (Ok(id), Ok(mut client)) => {
-            let rows_affected = client
-                .execute("DELETE FROM Sensors WHERE id = $1", &[&id])
-                .unwrap();
+// handle_delete_request function -----------------------------------------------------------------------------------------------------------------
 
-            if rows_affected == 0 {
-                return (NOT_FOUND.to_string(), "Sensor not found".to_string());
-            }
-
-            (
-                OK_RESPONSE.to_string(),
-                "tarea eliminada con exito".to_string(),
-            )
-        }
-
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
-    }
-}
-*/
-
-fn handle_delete_sensor_request(request: &str) -> (String, String) {
+fn handle_delete_sensor_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         Client::connect(DB_URL, NoTls),
@@ -629,20 +563,17 @@ fn handle_delete_sensor_request(request: &str) -> (String, String) {
                 .unwrap();
 
             if rows_affected == 0 {
-                return (NOT_FOUND.to_string(), "Entry no se encontró".to_string());
+                return build_not_found_response("Entry no se encontró");
             }
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada eliminada con exito".to_string(),
-            )
+            build_ok_response("Entrada eliminada con exito")
         }
 
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        _ => build_internal_error_response("Error"),
     }
 }
 
-fn handle_delete_log_request(request: &str) -> (String, String) {
+fn handle_delete_log_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         Client::connect(DB_URL, NoTls),
@@ -653,20 +584,17 @@ fn handle_delete_log_request(request: &str) -> (String, String) {
                 .unwrap();
 
             if rows_affected == 0 {
-                return (NOT_FOUND.to_string(), "Entry no se encontró".to_string());
+                return build_not_found_response("Entry no se encontró");
             }
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada eliminada con exito".to_string(),
-            )
+            build_ok_response("Entrada eliminada con exito")
         }
 
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        _ => build_internal_error_response("Error"),
     }
 }
 
-fn handle_delete_status_request(request: &str) -> (String, String) {
+fn handle_delete_status_request(request: &str) -> String {
     match (
         get_id(&request).parse::<i32>(),
         Client::connect(DB_URL, NoTls),
@@ -677,16 +605,13 @@ fn handle_delete_status_request(request: &str) -> (String, String) {
                 .unwrap();
 
             if rows_affected == 0 {
-                return (NOT_FOUND.to_string(), "Entry no se encontró".to_string());
+                return build_not_found_response("Entry no se encontró");
             }
 
-            (
-                OK_RESPONSE.to_string(),
-                "Entrada eliminada con exito".to_string(),
-            )
+            build_ok_response("Entrada eliminada con exito")
         }
 
-        _ => (INTERNAL_SERVER_ERROR.to_string(), "Error".to_string()),
+        _ => build_internal_error_response("Error"),
     }
 }
 
@@ -740,7 +665,15 @@ fn get_sensor_request_body(request: &str) -> Result<Sensor, serde_json::Error> {
     serde_json::from_str(request.split("\r\n\r\n").last().unwrap_or_default())
 }
 
+fn get_sensor_vec_request_body(request: &str) -> Result<Vec<Sensor>, serde_json::Error> {
+    serde_json::from_str(request.split("\r\n\r\n").last().unwrap_or_default())
+}
+
 fn get_log_request_body(request: &str) -> Result<Log, serde_json::Error> {
+    serde_json::from_str(request.split("\r\n\r\n").last().unwrap_or_default())
+}
+
+fn get_log_vec_request_body(request: &str) -> Result<Vec<Log>, serde_json::Error> {
     serde_json::from_str(request.split("\r\n\r\n").last().unwrap_or_default())
 }
 
