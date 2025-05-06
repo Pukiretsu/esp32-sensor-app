@@ -2,7 +2,7 @@ use chrono::{NaiveDate, NaiveTime};
 use postgres::Error as PostgresError;
 use postgres::{Client, NoTls};
 use std::env;
-use std::io::{Read, Write};
+use std::io::{BufRead, BufReader, Read, Write};
 use std::net::{TcpListener, TcpStream};
 
 #[macro_use]
@@ -167,26 +167,54 @@ fn main() {
 // handle_client function
 
 fn handle_client(mut stream: TcpStream) {
-    let mut buffer = [0; 4096];
-    let mut request = String::new();
+    let mut reader = BufReader::new(&mut stream);
+    let mut headers = String::new();
 
-    match stream.read(&mut buffer) {
-        Ok(size) if size > 0 => {
-            request.push_str(String::from_utf8_lossy(&buffer[..size]).as_ref());
-            println!("Petición recibida:\n{}", request);
-
-            let response = route_request(&request);
-
-            if let Err(e) = stream.write_all(response.as_bytes()) {
-                eprintln!("Error al enviar la respuesta: {}", e);
+    // Leer cabeceras línea por línea
+    loop {
+        let mut line = String::new();
+        match reader.read_line(&mut line) {
+            Ok(0) => {
+                eprintln!("Cliente cerró la conexión sin enviar cabeceras.");
+                return;
+            }
+            Ok(_) => {
+                if line == "\r\n" {
+                    break; // fin de cabeceras
+                }
+                headers.push_str(&line);
+            }
+            Err(e) => {
+                eprintln!("Error leyendo cabeceras: {}", e);
+                return;
             }
         }
-        Ok(_) => {
-            eprintln!("Cliente cerró la conexión sin enviar datos.");
-        }
-        Err(e) => {
-            eprintln!("Error al leer del stream: {}", e);
-        }
+    }
+
+    // Extraer Content-Length
+    let content_length = headers
+        .lines()
+        .find(|line| line.to_lowercase().starts_with("content-length"))
+        .and_then(|line| line.split(':').nth(1))
+        .and_then(|val| val.trim().parse::<usize>().ok())
+        .unwrap_or(0);
+
+    // Leer cuerpo completo (si hay)
+    let mut body = vec![0; content_length];
+    if let Err(e) = reader.read_exact(&mut body) {
+        eprintln!("Error leyendo el cuerpo: {}", e);
+        return;
+    }
+
+    let request_full = format!("{}{}", headers, String::from_utf8_lossy(&body));
+    println!("Petición completa:\n{}", request_full);
+
+    // Procesar la petición
+    let response = route_request(&request_full);
+
+    // Enviar respuesta
+    if let Err(e) = stream.write_all(response.as_bytes()) {
+        eprintln!("Error al enviar la respuesta: {}", e);
     }
 }
 
