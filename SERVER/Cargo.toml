@@ -2,11 +2,22 @@
 name = "sensor_log_api"
 version = "0.1.0"
 edition = "2021"
+publish = false
+authors = ["Angel Gonzalez <anggonpad@gmail.com>"]
 
 [dependencies]
-postgres = {version = "0.19", features = ["with-chrono-0_4", "with-time-0_3"]}
-serde = "1.0"
-serde_json = "1.0"
-serde_derive = "1.0"
-http-auth-basic = "<1.0"
-chrono = { version = "0.4", features = ["serde"] }
+tokio = {version = "1", features = ["full"]}
+# Serde and json dependencies
+serde = {version = "1", features = ["derive"]}
+serde_json = "1"
+# Axum dep
+axum = {version = "0.6", features = ["macros"]}
+tower-http = {version = "0.4", features = ["fs"]}
+tower-cookies = "0.9"
+
+# Time related dep
+chrono = {version = "0.4", features = ["serde"]}
+
+[dev-dependencies]
+anyhow = "1"
+httpc-test = "0.1.1"
