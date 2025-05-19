@@ -1,8 +1,10 @@
 #ifndef CONFIG_API_H
 #define CONFIG_API_H
 
+#include <WiFiClientSecure.h>
 #include <HTTPClient.h>
+#include <Arduino.h>
 
-void enviarDatosAPI(const char* url, String datos);
+bool enviarDatosAPI(const char* serverName, const String& payload);
 
 #endif

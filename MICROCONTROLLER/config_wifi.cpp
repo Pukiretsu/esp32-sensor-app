@@ -4,9 +4,28 @@
 
 const char* WIFI_TAG = "WIFI"; 
 
-void configurarWiFi(const char* ssid, const char* password) {
+void configurarWiFi_WPA2(const char* ssid, const char* password) {
   WiFi.mode(WIFI_STA); 
   WiFi.begin(ssid, password);
+
+  unsigned long startAttemptTime = millis();
+  unsigned long timeout = 10000; // 10 segundos
+
+  while (WiFi.status() != WL_CONNECTED && millis() - startAttemptTime < timeout) {
+    Serial.println(".");
+    delay(500);
+  }
+
+  if (WiFi.status() == WL_CONNECTED) {
+    logEvent(WIFI_TAG, "Conectado al WiFi!");
+  } else {
+    logEvent(WIFI_TAG, "Error: no se pudo conectar al WiFi.");
+  }
+}
+
+void configurarWiFi_OPEN(const char* ssid) {
+  WiFi.mode(WIFI_STA); 
+  WiFi.begin(ssid);
 
   unsigned long startAttemptTime = millis();
   unsigned long timeout = 10000; // 10 segundos

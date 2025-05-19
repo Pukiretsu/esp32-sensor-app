@@ -2,25 +2,28 @@
 #include "config_sd.h"
 #include "config_api.h"
 #include "config_wifi.h"
-#include "secrets.h"
 #include <Arduino.h>
 
+String ENDPOINT_LOG = cargarConfigENDPOINT_LOG();
 const char* archivoLog = "/log.txt";
 static int buzzerPin = -1;
 
 void logEvent(const char* tag, const char* msg) {
+  Serial.print("->> [");
   Serial.print(tag);
-  Serial.print(" | ");
+  Serial.print("]\t\t| ");
   Serial.println(msg);
 
-  String log = String(tag) + String(" | ") + String(msg);
+  String log = String(tag) + String("\t|\t") + String(msg);
   escribirArchivo(archivoLog, log.c_str());
   
   if (checkWifi()) {
     String json = String("{\"tag\": ") + String(tag) + String(", \"evento\": ") + String(msg) + String("}");
-    enviarDatosAPI(API_LOG, json);
+    enviarDatosAPI(ENDPOINT_LOG.c_str(), json);
   }
 }
+
+
 
 void inicializarBuzzer(int pin) {
   buzzerPin = pin;

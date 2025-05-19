@@ -1,26 +1,46 @@
 #include "config_api.h"
-#include "certs.h"
-#include <WiFiClientSecure.h>
-const char* root_ca = ROOT_CA_CERT;
+#include "logic_event_logger.h"
+#include "config_sd.h"
 
-void enviarDatosAPI(const char* url, String datos) {
-  WiFiClientSecure cliente;
-  cliente.setInsecure();
-  //cliente.setCACert(root_ca);  // Aquí cargamos el certificado raíz
+const char* logTag = "HTTP_CLIENT";
+String msg;
 
-  HTTPClient http;
-  http.begin(cliente, url);
+bool enviarDatosAPI(const char* serverName, const String& payload) {
+  char const* sslCert = cargarCertsSSL().c_str();
+  WiFiClientSecure client;
+  client.setCACert(sslCert);
 
-  http.addHeader("Content-Type", "application/json");
-  
-  int httpResponseCode = http.POST(datos);
-  if (httpResponseCode > 0) {
-    Serial.print("Código de respuesta HTTP: ");
-    Serial.println(httpResponseCode);
-  } else {
-    Serial.print("Error en la solicitud POST: ");
-    Serial.println(httpResponseCode);
+  HTTPClient https;
+  https.setTimeout(10000);
+
+  // Iniciar conexión HTTPS con el servidor
+  if (!https.begin(client, serverName)) {
+    logEvent(logTag, "Error al conectar con el servidor.");
+    return false;
   }
 
-  http.end();
+  // Establecer el tipo de contenido como JSON
+  https.addHeader("Content-Type", "application/json");
+
+  // Realizar la petición POST y capturar el código de respuesta
+  int httpCode = https.POST(payload);
+
+  if (httpCode > 0) {
+    msg = "Código de respuesta: " + String(httpCode);
+    logEvent(logTag, msg.c_str());
+
+    // Leer respuesta si el código es 200 OK
+    if (httpCode == HTTP_CODE_OK) {
+      String response = https.getString();
+      Serial.println("📥 Respuesta del servidor: " + response);
+      https.end();
+      return true;
+    }
+  } else {
+    msg = "Error en la conexión: " + https.errorToString(httpCode); 
+    logEvent(logTag, msg.c_str());
+  }
+
+  https.end(); // Finalizar la conexión
+  return false;
 }

@@ -2,18 +2,18 @@
 #include <time.h>
 #include <WiFi.h>
 #include <Arduino.h>
+#include "logic_event_logger.h"
 
 void sincronizarHoraNTP(const char* zonaHoraria) {
   configTzTime(zonaHoraria, "pool.ntp.org", "time.nist.gov");
-
-  Serial.print("Sincronizando hora NTP");
+  logEvent("NTP","Sincronizando hora NTP");
   struct tm tiempo;
   while (true) {
     if (getLocalTime(&tiempo)) break;
     Serial.print(".");
     delay(500);
   }
-  Serial.println("\nHora sincronizada correctamente.");
+  
 }
 
 String obtenerFechaHora() {
