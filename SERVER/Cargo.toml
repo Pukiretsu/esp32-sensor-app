@@ -7,9 +7,11 @@ authors = ["Angel Gonzalez <anggonpad@gmail.com>"]
 
 [dependencies]
 tokio = {version = "1", features = ["full"]}
+
 # Serde and json dependencies
 serde = {version = "1", features = ["derive"]}
 serde_json = "1"
+
 # Axum dep
 axum = {version = "0.6", features = ["macros"]}
 tower-http = {version = "0.4", features = ["fs"]}
@@ -17,6 +19,10 @@ tower-cookies = "0.9"
 
 # Time related dep
 chrono = {version = "0.4", features = ["serde"]}
+
+# Auth
+lazy-regex = "2"
+async-trait = "0.1"
 
 [dev-dependencies]
 anyhow = "1"

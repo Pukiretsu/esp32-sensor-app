@@ -12,7 +12,7 @@ async fn api_login(cookies: Cookies, payload: Json<LoginPayload>) -> Result<Json
     println!("->> {:<12} - Api_login", "HANDLER");
 
     // TODO: implement real db/auth logic
-    if payload.username != "demo1" || payload.passwd != "welcome" {
+    if payload.username != "esplogger" || payload.passwd != "jzsoNdIqMQGo6Tq" {
         return Err(Error::LoginFail);
     }
 

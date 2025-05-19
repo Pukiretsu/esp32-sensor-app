@@ -15,6 +15,7 @@ use std::net::SocketAddr;
 use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
 
+mod ctx;
 mod error;
 mod model;
 mod web;
@@ -24,10 +25,13 @@ async fn main() -> Result<()> {
     // Init ModelController.
     let mc = ModelController::new().await?;
 
+    let routes_apis = web::routes_dht11_records::routes(mc.clone())
+        .route_layer(middleware::from_fn(web::mw_auth::mw_require_auth));
+
     let routes_all = Router::new()
         .merge(routes_hello())
         .merge(web::routes_login::routes())
-        .merge(web::routes_dht11_records::routes(mc.clone()))
+        .nest("/api", routes_apis)
         .layer(middleware::map_response(main_response_mapper))
         .layer(CookieManagerLayer::new())
         .fallback_service(routes_static());

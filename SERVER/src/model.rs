@@ -15,8 +15,8 @@ pub struct Dht11Record {
     pub dht11_number: i32,
     pub temperature: f32,
     pub humidity: f32,
-    pub date: NaiveDate,
-    pub time: NaiveTime,
+    pub date: Option<NaiveDate>,
+    pub time: Option<NaiveTime>,
 }
 
 #[derive(Deserialize)]
@@ -25,8 +25,8 @@ pub struct Dht11RecordPending {
     pub dht11_number: i32,
     pub temperature: f32,
     pub humidity: f32,
-    pub date: NaiveDate,
-    pub time: NaiveTime,
+    pub date: Option<NaiveDate>,
+    pub time: Option<NaiveTime>,
 }
 
 // endregion: --- Dht11Record Types

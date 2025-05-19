@@ -16,10 +16,10 @@ async fn quick_dev() -> Result<()> {
         }),
     );
 
-    req_login.await?.print().await?;
+    //req_login.await?.print().await?;
 
     let req_create_dht11_record = hc.do_post(
-        "/sensor",
+        "/api/sensor",
         json!({
             "record_session": "Test_Session",
             "dht11_number": 1,
@@ -31,6 +31,8 @@ async fn quick_dev() -> Result<()> {
     );
 
     req_create_dht11_record.await?.print().await?;
+
+    hc.do_get("/api/sensor").await?.print().await?;
     //hc.do_get("/hello2/Niggerman").await?.print().await?;
     //hc.do_get("/src/main.rs").await?.print().await?;
 
