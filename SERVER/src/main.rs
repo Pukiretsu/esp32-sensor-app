@@ -8,7 +8,7 @@ use axum::{
     response::{Html, IntoResponse, Response},
     routing::{get, get_service},
     Router,
-};git 
+};
 use model::ModelController;
 use serde::Deserialize;
 use std::net::SocketAddr;
