@@ -5,14 +5,14 @@ use serde_json::json;
 
 #[tokio::test]
 async fn quick_dev() -> Result<()> {
-    let hc = httpc_test::new_client("https://")?;
+    let hc = httpc_test::new_client("http://localhost:8080")?;
 
-    hc.do_get("/hello2/Niggerman").await?.print().await?;
+    //hc.do_get("/hello2/nigga").await?.print().await?;
     let req_login = hc.do_post(
         "/api/login",
         json!({
-            "username": "demo1",
-            "passwd": "welcome"
+            "username": "esplogger",
+            "passwd": "jzsoNdIqMQGo6Tq"
         }),
     );
 
@@ -22,7 +22,7 @@ async fn quick_dev() -> Result<()> {
         "/api/sensor",
         json!({
             "record_session": "Test_Session",
-            "dht11_number": 1,
+            "dht11_number": 2,
             "temperature": 52.1,
             "humidity": 80.1,
             "date": "2025-05-06",

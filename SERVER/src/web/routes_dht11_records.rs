@@ -1,3 +1,4 @@
+use crate::ctx::Ctx;
 use crate::model::{Dht11Record, Dht11RecordPending, ModelController};
 use crate::Result;
 use axum::extract::Path;
@@ -16,26 +17,31 @@ pub fn routes(mc: ModelController) -> Router {
 
 async fn create_dht11_record(
     State(mc): State<ModelController>,
+    ctx: Ctx,
     Json(dht11_record_pending): Json<Dht11RecordPending>,
 ) -> Result<Json<Dht11Record>> {
     println!("->> {:<12} - Create Record of DHT11", "HANDLER");
 
-    let dht11_record = mc.create_dht11_record(dht11_record_pending).await?;
+    let dht11_record = mc.create_dht11_record(ctx, dht11_record_pending).await?;
     Ok(Json(dht11_record))
 }
 
-async fn list_dht11_records(State(mc): State<ModelController>) -> Result<Json<Vec<Dht11Record>>> {
+async fn list_dht11_records(
+    State(mc): State<ModelController>,
+    ctx: Ctx,
+) -> Result<Json<Vec<Dht11Record>>> {
     println!("->> {:<12} - list_dht11_records", "HANDLER");
-    let dht11_records = mc.list_dht11_records().await?;
+    let dht11_records = mc.list_dht11_records(ctx).await?;
     Ok(Json(dht11_records))
 }
 
 async fn delete_dht11_records(
     State(mc): State<ModelController>,
+    ctx: Ctx,
     Path(id): Path<u64>,
 ) -> Result<Json<Dht11Record>> {
     println!("->> {:<12} - delete_dht11_records", "HANDLER");
-    let dht11_record = mc.delete_dht11_records(id).await?;
+    let dht11_record = mc.delete_dht11_records(ctx, id).await?;
     Ok(Json(dht11_record))
 }
 

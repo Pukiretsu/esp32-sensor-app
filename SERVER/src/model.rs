@@ -1,7 +1,7 @@
 //! Simplistic model layer
 //! (with mock-store layer)
 
-use crate::{Error, Result};
+use crate::{ctx::Ctx, Error, Result};
 use chrono::{NaiveDate, NaiveTime};
 use serde::{Deserialize, Serialize};
 use std::sync::{Arc, Mutex};
@@ -11,6 +11,7 @@ use std::sync::{Arc, Mutex};
 #[derive(Clone, Debug, Serialize)]
 pub struct Dht11Record {
     pub id: u64,
+    pub cid: u64,
     pub record_session: String,
     pub dht11_number: i32,
     pub temperature: f32,
@@ -51,12 +52,14 @@ impl ModelController {
     // FIXME: Implement CREATE operation with SQLx
     pub async fn create_dht11_record(
         &self,
+        ctx: Ctx,
         dht11_record_pending: Dht11RecordPending,
     ) -> Result<Dht11Record> {
         let mut store = self.dht11record_store.lock().unwrap();
         let id = store.len() as u64;
         let dht11record = Dht11Record {
             id,
+            cid: ctx.user_id(),
             record_session: dht11_record_pending.record_session,
             dht11_number: dht11_record_pending.dht11_number,
             temperature: dht11_record_pending.temperature,
@@ -69,7 +72,7 @@ impl ModelController {
     }
 
     // FIXME: Implement READ operation with SQLx
-    pub async fn list_dht11_records(&self) -> Result<Vec<Dht11Record>> {
+    pub async fn list_dht11_records(&self, _ctx: Ctx) -> Result<Vec<Dht11Record>> {
         let store = self.dht11record_store.lock().unwrap();
 
         let records = store.iter().filter_map(|t| t.clone()).collect();
@@ -78,7 +81,7 @@ impl ModelController {
     }
 
     // FIXME: Implement DELETE operation with SQLx
-    pub async fn delete_dht11_records(&self, id: u64) -> Result<Dht11Record> {
+    pub async fn delete_dht11_records(&self, _ctx: Ctx, id: u64) -> Result<Dht11Record> {
         let mut store = self.dht11record_store.lock().unwrap();
 
         let dht11_record = store.get_mut(id as usize).and_then(|t| t.take());
