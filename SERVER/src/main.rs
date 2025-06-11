@@ -8,7 +8,7 @@ use axum::{
     response::{Html, IntoResponse, Response},
     routing::{get, get_service},
     Router,
-};
+};git 
 use model::ModelController;
 use serde::Deserialize;
 use std::net::SocketAddr;
@@ -37,7 +37,7 @@ async fn main() -> Result<()> {
         .fallback_service(routes_static());
 
     // region: -- Server
-    let addr = SocketAddr::from(([127, 0, 0, 1], 8080));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 8080));
     println!("->> LISTENING on {addr}\n");
     axum::Server::bind(&addr)
         .serve(routes_all.into_make_service())
