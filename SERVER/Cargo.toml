@@ -27,6 +27,11 @@ async-trait = "0.1"
 strum_macros = "0.24"
 uuid = {version = "1", features = ["v4", "fast-rng",]}
 
+# sql related
+sqlx = { version = "0.8", features = ["runtime-tokio-rustls", "any", "postgres"] }
+envy = "0.4"
+dotenv = "0.15.0"
+
 [dev-dependencies]
 anyhow = "1"
 httpc-test = "0.1.1"

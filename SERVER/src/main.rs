@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use crate::{ctx::Ctx, log::log_request};
+use crate::{ctx::Ctx};
 
 pub use self::error::{Error, Result};
 
@@ -11,18 +11,41 @@ use model::ModelController;
 use serde::Deserialize;
 use serde_json::json;
 use uuid::Uuid;
-use std::net::SocketAddr;
+use std::{net::SocketAddr, time::Duration};
 use tower_cookies::CookieManagerLayer;
 use tower_http::services::ServeDir;
+use sqlx::{migrate::Migrator, pool, postgres::PgPoolOptions, PgPool};
+use dotenv::dotenv;
+
 
 mod ctx;
 mod error;
-mod log;
 mod model;
 mod web;
 
+static MIGRATOR: Migrator = sqlx::migrate!("./migrations");
+
+pub async fn run_migrations(pool: &PgPool) -> Result<(), sqlx::Error> {
+    MIGRATOR.run(pool).await
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
+    // init database connection
+    dotenv().ok();
+    let db_connection_str = std::env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "postgres//postgres:passwd@localhost".to_string());
+
+    println!("  ->> Connecting to: {db_connection_str}");
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .acquire_timeout(Duration::from_secs(60))
+        .connect(&db_connection_str)
+        .await
+        .expect("->> couldn't connect to database.\n");
+
+    static MIGRATOR: Migrator = sqlx::migrate!();
+
     // Init ModelController.
     let mc = ModelController::new().await?;
 
@@ -30,9 +53,8 @@ async fn main() -> Result<()> {
         .route_layer(middleware::from_fn(web::mw_auth::mw_require_auth));
 
     let routes_all = Router::new()
-        .merge(routes_hello())
         .merge(web::routes_login::routes())
-        .nest("/api", routes_apis)
+        .merge(routes_apis)
         .layer(middleware::map_response(main_response_mapper))
         .layer(middleware::from_fn_with_state(
             mc.clone(),
@@ -59,8 +81,8 @@ async fn main_response_mapper(
     req_method: Method,
     res: Response) -> Response {
     println!("->> {:<12} - main_response_mapper", "RES_MAPPER");
+    
     let uuid =  Uuid::new_v4();
-
     // -- get eventual response error.
     let service_error = res.extensions().get::<Error>();
     let client_status_error = service_error.map(|se| se.clien_status_and_error());
@@ -84,7 +106,7 @@ async fn main_response_mapper(
 
     // -- Build and log the server log line
     let client_error = client_status_error.unzip().1;
-    log_request(uuid, req_method, uri, ctx, service_error, client_error).await;
+    //log_request(uuid, req_method, uri, ctx, service_error, client_error).await;
     println!("  ->> server log line - {uuid} - Error: {service_error:?}");
 
     println!();
@@ -94,35 +116,3 @@ async fn main_response_mapper(
 fn routes_static() -> Router {
     Router::new().nest_service("/", get_service(ServeDir::new("./")))
 }
-
-// region: -- Routes Hello
-
-// set up routes composition
-fn routes_hello() -> Router {
-    Router::new()
-        .route("/hello", get(handler_hello))
-        .route("/hello2/:name", get(handler_hello2))
-}
-
-#[derive(Debug, Deserialize)]
-struct HelloParams {
-    name: Option<String>,
-}
-
-// E.g. '/hello?name=Some'
-async fn handler_hello(Query(params): Query<HelloParams>) -> impl IntoResponse {
-    println!("--> {:<12} - handler_hello - {params:?}", "HANDLER");
-
-    let name = params.name.as_deref().unwrap_or("World!");
-    Html(format!("Hello <strong>{name}</strong>"))
-}
-
-// E.g. '/Hello2/Some'
-
-async fn handler_hello2(Path(name): Path<String>) -> impl IntoResponse {
-    println!("->> {:<12} - handler_hello - {name:?}", "HANDLER");
-
-    Html(format!("Hello <strong>{name}</strong>"))
-}
-
-// endregion: -- Routes Hello
