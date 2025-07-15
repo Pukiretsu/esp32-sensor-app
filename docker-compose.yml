@@ -4,8 +4,6 @@ services:
     container_name: ss-gia-app
     restart: unless-stopped
     command: uvicorn main:app --host 0.0.0.0 --port 8000
-    volumes:
-      - db_data:/app/data/
     # labels:
     #   - "traefik.enable=true"
     #   - "traefik.http.routers.ss-gia-app.rule=Host(`secador-solar-gia.online`)"
@@ -26,6 +24,3 @@ services:
   #   ports:
   #     - "80:80"
   #     - "443:443"
-
-  volumes:
-    db_data:
