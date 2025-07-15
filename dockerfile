@@ -17,6 +17,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
+RUN mkdir -p data && chmod -R 777 data
+
 # Copia el resto del código de la aplicación al directorio de trabajo
 # El '.' al final indica el directorio actual en el host
 COPY . .
