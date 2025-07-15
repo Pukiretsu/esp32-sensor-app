@@ -1,0 +1,764 @@
+/* styles.css */
+
+body {
+    font-family: 'Inter', Arial, sans-serif; /* Usando Inter como fuente principal, si está disponible */
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa; /* gris claro */
+    background-image: url(https://www.graphicpear.com/wp-content/uploads/2022/10/Abstract-Geometric-3D-Seamless-Pattern-AI.png);
+    background-size: cover; /* Asegura que la imagen cubra todo el fondo */
+    background-attachment: fixed; /* Mantiene la imagen fija al hacer scroll */
+    background-position: center; /* Centra la imagen de fondo */
+}
+
+.content {
+    background-color: rgba(240, 255, 240, 0.95); /* honeydew más opaco para mejor contraste */
+    padding: 30px; /* Aumentar padding general */
+    min-height: calc(100vh - 80px - 40px); /* Ajustar altura total menos footer y margen */
+    box-sizing: border-box;
+    overflow-y: auto;
+    margin: 20px auto; /* Aumentar margen superior/inferior para más espacio */
+    max-width: 900px; /* Limitar el ancho máximo para mejor legibilidad en pantallas grandes */
+    width: 90%; /* Ajustar ancho relativo para adaptarse a diferentes tamaños de pantalla */
+    border-radius: 16px; /* Bordes más redondeados */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* Sombra más pronunciada para un efecto flotante */
+}
+
+@media (max-width: 768px) {
+    .content {
+        margin: 15px; /* Margen más ajustado en móviles */
+        margin-bottom: 60px;
+        width: auto;
+        max-width: none;
+        border-radius: 12px; /* Bordes ligeramente menos redondeados en móviles */
+        padding: 20px; /* Reducir padding en móviles */
+    }
+
+    .section-header {
+        flex-direction: column; /* Apilar elementos en columna */
+        align-items: center; /* Centrar elementos apilados */
+        margin-bottom: 15px; /* Ajustar margen */
+    }
+
+    .section-logo {
+        margin-right: 0;
+        margin-bottom: 15px; /* Espacio debajo del logo en móviles */
+    }
+
+    h2 {
+        font-size: 24px; /* Ajustar tamaño de h2 en móviles */
+    }
+
+    h3 {
+        font-size: 20px; /* Ajustar tamaño de h3 en móviles */
+    }
+
+    h4 {
+        font-size: 18px; /* Ajustar tamaño de h4 en móviles */
+    }
+
+    .navbar .nav-text {
+        display: none;
+    }
+
+    .material-symbols-outlined {
+        margin-right: 0;
+        font-size: 28px; /* Íconos un poco más grandes en móviles */
+    }
+
+    .nav-item {
+        padding: 8px; /* Padding más pequeño para ítems de navegación en móviles */
+    }
+
+    .filter-controls, .table-controls, .register-controller-form, .register-ensayo-form {
+        flex-direction: column; /* Apilar controles en móviles */
+        align-items: stretch; /* Estirar elementos para ocupar el ancho completo */
+        gap: 10px; /* Espacio entre elementos apilados */
+    }
+
+    .btn, .text-input {
+        width: 100%; /* Botones e inputs ocupan todo el ancho disponible */
+        box-sizing: border-box; /* Incluir padding y borde en el ancho */
+    }
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #1f2937; /* mismo color que la navbar para uniformidad */
+    color: #e5e7eb; /* gris claro */
+    text-align: center;
+    padding: 12px 0; /* Aumentar padding del footer */
+    font-size: 15px; /* Fuente ligeramente más grande */
+    z-index: 1000;
+}
+
+/* Barra de navegación */
+.navbar {
+    background-color: #1f2937; /* gris oscuro */
+    padding: 15px 0; /* Aumentar padding de la navbar */
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Sombra para la navbar */
+}
+
+.material-symbols-outlined {
+    font-size: 22px; /* Tamaño de ícono por defecto */
+    vertical-align: middle;
+    margin-right: 10px; /* Más espacio para el ícono */
+}
+
+.navbar a {
+    color: #e5e7eb; /* gris claro */
+    text-decoration: none;
+    margin: 0 25px; /* Más espacio entre ítems de navegación */
+    font-size: 19px; /* Fuente ligeramente más grande */
+    padding: 5px 0; /* Padding vertical para el área de clic */
+    display: inline-flex; /* Para alinear ícono y texto */
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar a:hover {
+    text-decoration: underline;
+    color: #63b3ed; /* Un azul más claro al pasar el mouse */
+}
+
+.navbar a.active {
+    color: #3b82f6; /* azul profesional */
+    font-weight: bold;
+    border-bottom: 2px solid #3b82f6; /* Subrayado más pronunciado para el activo */
+}
+
+/* Contenedor de contenido */
+.content {
+    padding: 20px;
+}
+
+/* Estilo de las secciones */
+.section {
+    display: none;
+    padding: 20px 0; /* Añadir padding vertical a las secciones */
+}
+
+.section.active {
+    display: block;
+}
+
+h2 {
+    color: #111827; /* casi negro */
+    font-size: 28px; /* Tamaño de h2 */
+    margin-bottom: 25px; /* Más espacio debajo de h2 */
+    text-align: center; /* Centrar títulos principales */
+}
+
+h3 {
+    color: #1f2937; /* Color más oscuro para h3 */
+    font-size: 22px; /* Tamaño de h3 */
+    margin-top: 30px; /* Más espacio arriba de h3 */
+    margin-bottom: 15px; /* Más espacio debajo de h3 */
+    border-bottom: 1px solid #e2e8f0; /* Línea sutil debajo de h3 */
+    padding-bottom: 8px; /* Padding para la línea */
+}
+
+h4 {
+    color: #2d3748; /* Color más oscuro para h4 */
+    font-size: 19px; /* Tamaño de h4 */
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+h5 {
+    color: #4a5568; /* Color más oscuro para h5 */
+    font-size: 17px; /* Tamaño de h5 */
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Estilos para las tablas */
+table {
+    width: 100%;
+    background: #374151; /* gris azulado oscuro */
+    border-radius: 0.5em; /* Bordes más redondeados para la tabla */
+    border-collapse: collapse;
+    margin: 1.5em 0; /* Más margen arriba y abajo de la tabla */
+    overflow: hidden; /* Asegura que los bordes redondeados se apliquen al contenido */
+}
+
+th {
+    border-bottom: 2px solid #1f2937; /* Borde más grueso para el encabezado */
+    color: #ffffff;
+    font-weight: 600;
+    padding: 0.8em 1.2em; /* Más padding en el encabezado */
+    text-align: left;
+    width: auto;
+    background-color: #2c3e50; /* Fondo ligeramente diferente para el encabezado */
+}
+
+.col-id {
+    width: 15%; /* Ajustar ancho para timestamp completo */
+}
+
+.col-fecha {
+    width: 10%;
+}
+
+.col-hora {
+    width: 10%;
+}
+
+.col-sensor {
+    width: 8%;
+}
+
+.col-ensayo { /* Nueva columna para Ensayo */
+    width: 20%;
+}
+
+.col-temperatura {
+    width: 15%;
+}
+
+.col-humedad {
+    width: 15%;
+}
+
+td {
+    color: #f9fafb; /* blanco grisáceo */
+    font-weight: 400;
+    padding: 0.8em 1.2em; /* Más padding en las celdas */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil entre filas */
+}
+
+tbody tr {
+    transition: background 0.25s ease;
+}
+
+tbody tr:hover {
+    background: #4b5563; /* gris intermedio */
+}
+
+#sensor-table,
+#logs-table {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-top: 1.5rem; /* Más margen superior */
+    border-radius: 0.5em;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra para las tablas */
+}
+
+#sensor-table table {
+    min-width: 700px; /* Aumentar min-width para mejor legibilidad */
+}
+
+#logs-table table {
+    min-width: 700px; /* Aumentar min-width para mejor legibilidad */
+}
+
+.new-row {
+    background-color: #fef3c7; /* amarillo pastel */
+    transition: background-color 0.5s ease;
+}
+
+.new-row td {
+    color: black !important;
+}
+
+.progress-container {
+    width: 100%;
+    background-color: #e5e7eb;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 25px; /* Más espacio debajo */
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar {
+    height: 35px; /* Barra de progreso ligeramente más alta */
+    background-color: #3b82f6;
+    color: white;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    transition: width 1s ease-in-out;
+    border-radius: 20px; /* Asegurar que los bordes redondeados se mantengan */
+}
+
+/* Línea de tiempo de hitos */
+.timeline {
+    list-style: none;
+    padding: 0;
+    border-left: 4px solid #3b82f6;
+    margin: 1.5rem 0; /* Más margen */
+}
+
+.timeline li {
+    padding: 0.7rem 1.2rem; /* Más padding */
+    margin-bottom: 0.7rem; /* Más espacio entre ítems */
+    position: relative;
+    background-color: #f0f4f8; /* Fondo sutil para cada hito */
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.timeline li::before {
+    content: '';
+    position: absolute;
+    left: -11px; /* Ajustar posición para que el círculo esté en la línea */
+    top: 15px; /* Ajustar posición vertical */
+    width: 14px; /* Círculo ligeramente más grande */
+    height: 14px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    border: 2px solid #ffffff; /* Borde blanco para el círculo */
+}
+
+/* Lecturas actuales */
+.sensor-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; /* Más espacio entre tarjetas */
+    margin-top: 30px; /* Más margen superior */
+    margin-bottom: 30px; /* Más margen inferior */
+}
+
+.sensor-card {
+    width: 260px; /* Tarjetas ligeramente más anchas */
+    background-color: #ffffff;
+    border-radius: 12px; /* Bordes más redondeados */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    padding: 20px; /* Más padding */
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sensor-card:hover {
+    transform: translateY(-8px); /* Mayor levantamiento al pasar el mouse */
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2); /* Sombra más pronunciada al pasar el mouse */
+}
+
+.sensor-icon {
+    font-size: 45px; /* Ícono ligeramente más grande */
+    color: #3b82f6;
+    margin-bottom: 15px; /* Más espacio debajo del ícono */
+}
+
+.sensor-card h3 {
+    margin: 0;
+    font-size: 20px; /* Título de tarjeta más grande */
+    color: #1f2937;
+    border-bottom: none; /* Eliminar borde de h3 en las tarjetas */
+    padding-bottom: 0;
+}
+
+.sensor-card p {
+    margin: 8px 0 0; /* Más espacio para el texto */
+    color: #4b5563;
+    font-size: 15px; /* Fuente ligeramente más grande */
+}
+
+.material-symbols-outlined.icon {
+    font-size: 55px; /* Ícono grande para secciones */
+    margin-bottom: 10px;
+    color: #3b82f6;
+}
+
+/* Imagen del prototipo */
+.prototipo-img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px; /* Bordes más redondeados */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    margin-top: 1.5rem; /* Más margen */
+}
+
+.prototype-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Más espacio entre tarjetas de prototipo */
+    justify-content: center;
+    margin-top: 30px; /* Más margen superior */
+}
+
+.prototype-card {
+    width: 300px; /* Tarjetas de prototipo ligeramente más anchas */
+    background-color: #ffffff;
+    border-radius: 12px; /* Bordes más redondeados */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.prototype-card:hover {
+    transform: translateY(-6px); /* Mayor levantamiento */
+}
+
+.prototype-card img {
+    width: 100%;
+    height: 200px; /* Imágenes ligeramente más altas */
+    object-fit: cover;
+}
+
+.prototype-info {
+    padding: 15px; /* Más padding */
+    text-align: left;
+}
+
+.prototype-info h3 {
+    margin: 0 0 10px; /* Más espacio */
+    font-size: 19px; /* Título de info más grande */
+    color: #1f2937;
+    border-bottom: none; /* Eliminar borde de h3 aquí */
+    padding-bottom: 0;
+}
+
+.prototype-info p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 15px; /* Fuente ligeramente más grande */
+}
+
+.section-logo {
+    height: 110px; /* Ajusta el tamaño de la imagen */
+    max-width: 100%; /* Asegura que no se desborde */
+}
+
+.section-header {
+    display: flex;
+    flex-flow: row;
+    align-items: center; /* Centrar verticalmente */
+    justify-content: center; /* Centrar horizontalmente */
+    gap: 20px; /* Espacio entre el logo y el título */
+    margin-bottom: 30px; /* Más margen inferior */
+}
+
+.about-section {
+    padding: 2.5rem; /* Más padding */
+    background-color: #f9fafb;
+    color: #111827;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem; /* Más espacio entre secciones */
+    border-radius: 12px; /* Bordes redondeados */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.about-title {
+    font-size: 2.5rem; /* Título más grande */
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem; /* Más margen */
+    color: #111827;
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ajustar minmax para tarjetas de equipo */
+    gap: 2rem; /* Más espacio entre tarjetas de equipo */
+    width: 100%;
+    max-width: 1100px; /* Aumentar ancho máximo para la grilla de equipo */
+}
+
+.team-card {
+    background-color: #ffffff;
+    border-radius: 1.2rem; /* Bordes más redondeados */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    padding: 1.5rem; /* Más padding */
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.team-card:hover {
+    transform: translateY(-8px); /* Mayor levantamiento */
+}
+
+.team-card img {
+    width: 110px; /* Imágenes de equipo ligeramente más grandes */
+    height: 110px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 1rem; /* Más espacio */
+    border: 4px solid #3b82f6; /* Borde más grueso */
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.3); /* Sombra alrededor del borde */
+}
+
+.team-card h3 {
+    margin: 0.5rem 0 0.3rem;
+    font-size: 1.2rem; /* Título de equipo más grande */
+    color: #1f2937;
+    border-bottom: none; /* Eliminar borde de h3 en las tarjetas */
+    padding-bottom: 0;
+}
+
+.team-card p {
+    font-size: 1rem; /* Fuente ligeramente más grande */
+    margin: 0.3rem 0;
+    color: #4b5563;
+}
+
+.team-card .social-links {
+    margin-top: 1rem; /* Más espacio */
+    display: flex;
+    justify-content: center;
+    gap: 1rem; /* Más espacio entre íconos sociales */
+}
+
+.team-card .social-links a {
+    color: #3b82f6;
+    font-size: 1.4rem; /* Íconos sociales más grandes */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.team-card .social-links a:hover {
+    color: #0056b3; /* Cambio de color al pasar el mouse */
+}
+
+.tech-summary {
+    margin-top: 4rem; /* Más margen superior */
+    text-align: center;
+}
+
+.section-subtitle {
+    font-size: 2rem; /* Subtítulo más grande */
+    margin-bottom: 2rem; /* Más margen inferior */
+    color: #1f2937;
+    font-weight: bold;
+}
+
+.tech-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem; /* Más espacio entre tarjetas de tecnología */
+}
+
+.tech-item {
+    background-color: #ffffffdd;
+    border-radius: 1.2rem; /* Bordes más redondeados */
+    padding: 1.8rem; /* Más padding */
+    max-width: 250px; /* Aumentar ancho máximo */
+    flex: 1 1 220px; /* Ajustar flex-basis */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tech-item:hover {
+    transform: translateY(-8px); /* Mayor levantamiento */
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18); /* Sombra más pronunciada */
+}
+
+.tech-icon {
+    font-size: 60px; /* Ícono de tecnología más grande */
+    color: #3b82f6;
+    margin-bottom: 0.8rem; /* Más espacio */
+}
+
+.tech-item h4 {
+    margin: 0.6rem 0;
+    color: #1f2937;
+    font-weight: 700; /* Fuente más negrita */
+    font-size: 1.15rem; /* Título de tecnología más grande */
+}
+
+.tech-item p {
+    font-size: 1rem; /* Fuente ligeramente más grande */
+    color: #374151;
+}
+
+
+.table-controls {
+    margin-top: 20px; /* Más espacio arriba */
+    margin-bottom: 20px; /* Más espacio abajo */
+    display: flex;
+    gap: 15px; /* Más espacio entre botones */
+    flex-wrap: wrap; /* Permitir que los botones se envuelvan */
+    justify-content: flex-start; /* Alinear a la izquierda */
+}
+
+.btn {
+    padding: 12px 25px; /* Aumentar padding */
+    border: none;
+    border-radius: 10px; /* Bordes aún más redondeados */
+    cursor: pointer;
+    font-size: 17px; /* Fuente más grande */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Más espacio entre ícono y texto */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Transición suave con curva */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); /* Sombra para profundidad */
+    text-transform: uppercase; /* Texto en mayúsculas */
+    letter-spacing: 0.5px; /* Espaciado entre letras */
+    font-weight: bold; /* Texto más negrita */
+}
+
+.btn:hover {
+    transform: translateY(-3px); /* Mayor levantamiento al pasar el mouse */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25); /* Sombra más pronunciada */
+    filter: brightness(1.1); /* Ligeramente más brillante */
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    background-image: linear-gradient(to right, #007bff 0%, #0056b3 100%); /* Gradiente sutil */
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+    background-image: linear-gradient(to right, #28a745 0%, #218838 100%);
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    margin-top: 10px; /* Mantener margen si se envuelve */
+    background-image: linear-gradient(to right, #dc3545 0%, #c82333 100%);
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Nuevos estilos para la vista de datos */
+.register-controller-form, .register-ensayo-form {
+    display: flex;
+    gap: 15px; /* Más espacio entre elementos del formulario */
+    margin-bottom: 25px; /* Más margen inferior */
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.text-input {
+    flex-grow: 1;
+    padding: 12px 18px; /* Aumentar padding */
+    border: 2px solid #cbd5e0; /* Borde más visible */
+    border-radius: 10px; /* Bordes más redondeados */
+    font-size: 17px; /* Fuente más grande */
+    min-width: 200px; /* Aumentar ancho mínimo */
+    background-color: #ffffff;
+    color: #1f2937;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra interior más pronunciada */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.text-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4); /* Sombra de enfoque más grande */
+    outline: none;
+}
+
+.controller-card, .ensayo-card {
+    width: 300px; /* Tarjetas ligeramente más anchas */
+    padding: 18px; /* Más padding */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+    margin-bottom: 15px; /* Más espacio */
+    border-radius: 12px; /* Bordes más redondeados */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #ffffff; /* Fondo blanco explícito */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.controller-card:hover, .ensayo-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.controller-card .sensor-icon, .ensayo-card .sensor-icon {
+    font-size: 35px; /* Ícono ligeramente más grande */
+    margin-bottom: 15px; /* Más espacio */
+}
+
+.controller-card h3, .ensayo-card h3 {
+    font-size: 18px; /* Título de tarjeta más grande */
+    margin-bottom: 8px; /* Más espacio */
+    color: #1f2937;
+    border-bottom: none; /* Eliminar borde de h3 en las tarjetas */
+    padding-bottom: 0;
+}
+
+.controller-card p, .ensayo-card p {
+    font-size: 13px; /* Fuente ligeramente más grande */
+    color: #6c757d;
+    margin-bottom: 10px; /* Más espacio debajo de los párrafos */
+}
+
+.controller-cards, .ensayo-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Ajustar minmax */
+    gap: 20px; /* Más espacio entre tarjetas */
+    margin-top: 20px; /* Más espacio */
+}
+
+.view-data-btn {
+    margin-top: 15px; /* Más margen superior */
+    width: 100%;
+}
+
+/* Nuevos estilos para el filtro de ensayos */
+.filter-controls {
+    display: flex;
+    gap: 15px; /* Más espacio entre elementos del filtro */
+    margin-bottom: 20px; /* Más margen inferior */
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* Alinear a la izquierda */
+}
+
+.filter-controls label {
+    font-weight: bold;
+    color: #1f2937;
+    font-size: 17px; /* Fuente más grande */
+}
+
+.filter-controls .text-input {
+    flex-grow: 1;
+    padding: 12px 18px; /* Aumentar padding */
+    border: 2px solid #cbd5e0; /* Borde más visible */
+    border-radius: 10px; /* Bordes más redondeados */
+    font-size: 17px; /* Fuente más grande */
+    min-width: 180px; /* Aumentar ancho mínimo */
+    background-color: #ffffff;
+    color: #1f2937;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%234a5568" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right 15px center; /* Ajustar posición de la flecha */
+    padding-right: 45px; /* Más espacio para la flecha */
+    cursor: pointer;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.08); /* Sombra interior */
+}
+
+.filter-controls .text-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.4);
+}
+
+/* Estilos para las opciones del select */
+.filter-controls .text-input option {
+    background-color: #ffffff;
+    color: #1f2937;
+    padding: 10px; /* Más padding para las opciones */
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secador Solar - Datos Sensores</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/style.css') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', path='favicon.png') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+</head>
+
+<body>
+
+    <!-- Barra de Navegación -->
+    <div class="navbar">
+        <a href="/" class="nav-item" id="inicio-link">
+            <span class="material-symbols-outlined">home</span>
+            <span class="nav-text">Inicio</span>
+        </a>
+        <a href="/datos" class="nav-item active" id="sensor-link">
+            <span class="material-symbols-outlined">sensors</span>
+            <span class="nav-text">Datos Sensor</span>
+        </a>
+        <a href="/logs" class="nav-item" id="logs-link">
+            <span class="material-symbols-outlined">list_alt</span>
+            <span class="nav-text">Logs</span>
+        </a>
+        <a href="/acerca" class="nav-item" id="acerca-link">
+            <span class="material-symbols-outlined">info</span>
+            <span class="nav-text">Acerca de</span>
+        </a>
+    </div>
+
+    <!-- Contenido -->
+    <div class="content">
+        <div class="section active" id="datos-section">
+            <h2>Gestión de Controladores y Datos de Sensores</h2>
+
+            <!-- Sección para Registrar Nuevo Controlador -->
+            <h3>Registrar Nuevo Controlador</h3>
+            <div class="register-controller-form">
+                <input type="text" id="new-controller-name" placeholder="Nombre del nuevo controlador" class="text-input">
+                <button id="register-controller-btn" class="btn btn-primary">
+                    <span class="material-symbols-outlined">add_circle</span>
+                    <span>Registrar Controlador</span>
+                </button>
+                <p id="registered-uuid-display" style="margin-top: 10px; font-weight: bold;"></p>
+            </div>
+
+            <!-- Sección para Listar Controladores Registrados -->
+            <h3>Controladores Registrados</h3>
+            <div id="controladores-list" class="controller-cards">
+                <p>Cargando controladores...</p>
+                <!-- Los controladores se cargarán aquí dinámicamente -->
+            </div>
+
+            <hr style="margin: 30px 0; border-top: 1px solid #ccc;">
+
+            <!-- Sección de Detalles del Controlador Seleccionado (oculta por defecto) -->
+            <div id="controller-details-section" style="display: none;">
+                <h3 id="selected-controller-title">Controlador Seleccionado: <span id="selected-controller-name"></span></h3>
+                <p>UUID: <span id="selected-controller-uuid-display"></span></p>
+
+                <!-- Sección para Gestión de Ensayos -->
+                <h4>Gestión de Ensayos para este Controlador</h4>
+                <div class="register-ensayo-form">
+                    <input type="text" id="new-ensayo-name" placeholder="Nombre del nuevo ensayo" class="text-input">
+                    <button id="register-ensayo-btn" class="btn btn-primary">
+                        <span class="material-symbols-outlined">add_circle</span>
+                        <span>Registrar Ensayo</span>
+                    </button>
+                    <p id="registered-ensayo-uuid-display" style="margin-top: 10px; font-weight: bold;"></p>
+                </div>
+
+                <h5>Ensayos Registrados para <span id="ensayos-controller-name"></span></h5>
+                <div id="ensayos-list" class="ensayo-cards">
+                    <p>Cargando ensayos...</p>
+                    <!-- Los ensayos se cargarán aquí dinámicamente -->
+                </div>
+
+                <hr style="margin: 30px 0; border-top: 1px solid #ccc;">
+
+                <!-- Sección para Datos del Controlador Seleccionado -->
+                <h4>Lecturas de Sensores para <span id="lecturas-controller-name"></span></h4>
+                <div class="filter-controls">
+                    <label for="ensayo-filter">Filtrar por Ensayo:</label>
+                    <select id="ensayo-filter" class="text-input">
+                        <option value="">Todos los Ensayos</option>
+                        <!-- Opciones de ensayos se cargarán aquí -->
+                    </select>
+                    <button id="show-all-data-btn" class="btn btn-primary">
+                        <span class="material-symbols-outlined">data_object</span>
+                        <span>Mostrar Todas las Lecturas</span>
+                    </button>
+                </div>
+                <div class="table-controls">
+                    <button id="refresh-sensor-btn" class="btn btn-primary">
+                        <span class="material-symbols-outlined">refresh</span>
+                        <span>Refrescar</span>
+                    </button>
+                    <button id="export-sensor-btn" class="btn btn-success">
+                        <span class="material-symbols-outlined">Download</span>
+                        <span>Descargar .csv</span>
+                    </button>
+                </div>
+                <div id="sensor-table"></div> <!-- Aquí se cargará la tabla de los sensores -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ url_for('static', path='js/app.js') }}"></script>
+    <div class="footer">
+        &copy; 2025 Secador Solar GIA - Todos los derechos reservados
+    </div>
+</body>
+
+</html>
