@@ -1,27 +1,26 @@
 services:
-  reverse-proxy:
-    image: traefik:v3.1
-    command: 
-      - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entryPoints.websecure.address=:443"
-      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.myresolver.acme.email=cr3pym4st3r@gmail.com"
-      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-    ports:
-      - "80:80"
-      - "443:443"
   ss-gia-app:
     build: .
     container_name: ss-gia-app
     restart: unless-stopped
     command: uvicorn main:app --host 0.0.0.0 --port 8000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.ss-gia-app.rule=Host(`secador-solar-gia.online`)"
-      - "traefik.http.routers.ss-gia-app.entryPoints=websecure"
-      - "traefik.http.routers.ss-gia-app.tls.certresolver=myresolver"
-      
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.ss-gia-app.rule=Host(`secador-solar-gia.online`)"
+    #   - "traefik.http.routers.ss-gia-app.entryPoints=websecure"
+    #   - "traefik.http.routers.ss-gia-app.tls.certresolver=myresolver"
+  # reverse-proxy:
+  #   image: traefik:v3.1
+  #   command: 
+  #     - "--providers.docker"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entryPoints.websecure.address=:443"
+  #     - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+  #     - "--certificatesresolvers.myresolver.acme.email=cr3pym4st3r@gmail.com"
+  #     - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+  #     - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
