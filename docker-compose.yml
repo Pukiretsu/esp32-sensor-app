@@ -21,12 +21,14 @@ services:
     build: .
     container_name: ss-gia-app
     restart: unless-stopped
-    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --forwarded-allow-ips '*'
     labels:
        - "traefik.enable=true"
        - "traefik.http.routers.ss-gia-app.rule=Host(`www.secador-solar-gia.online`)"
        - "traefik.http.routers.ss-gia-app.entryPoints=websecure"
        - "traefik.http.routers.ss-gia-app.tls.certresolver=myresolver"
+       - "traefik.http.routers.ss-gia-app.middlewares=forward-proto"
+       - "traefik.http.middlewares.forward-proto.headers.customRequestHeaders.X-Forwarded-Proto=https"
 
 volumes:
   letsencrypt:
