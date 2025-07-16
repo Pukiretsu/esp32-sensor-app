@@ -3,7 +3,7 @@ import sqlite3
 from contextlib import contextmanager
 
 # Define el nombre del archivo de la base de datos SQLite
-DATABASE_URL = "data/sensores.db"
+DATABASE_URL = "../data/sensores.db"
 
 def init_db():
     """
@@ -36,8 +36,8 @@ def init_db():
                 timestamp TEXT NOT NULL,          -- Fecha y hora de la lectura en formato ISO (zona horaria Colombia)
                 uuid_controlador TEXT NOT NULL,   -- UUID único del controlador
                 id_sensor INTEGER NOT NULL,       -- ID del sensor (1 a 4)
-                uuid_ensayo TEXT NOT NULL,        -- UUID del ensayo asociado
-                nombre_ensayo TEXT NOT NULL,      -- Nombre del ensayo
+                uuid_ensayo TEXT,                 -- UUID del ensayo asociado
+                nombre_ensayo TEXT,               -- Nombre del ensayo
                 lectura_temperatura REAL NOT NULL,-- Medida de temperatura en Celsius
                 lectura_humedad REAL NOT NULL,    -- Medida de humedad
                 PRIMARY KEY (timestamp, uuid_controlador, id_sensor), -- Clave primaria compuesta para unicidad

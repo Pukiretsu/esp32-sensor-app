@@ -21,11 +21,11 @@ app = FastAPI(
 )
 
 # Configura Jinja2 para las plantillas HTML
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="../templates")
 
 # Monta el directorio 'static' para servir archivos CSS, JS, imágenes, etc.
 # Los archivos en 'static' serán accesibles en la URL /static/
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="../static"), name="static")
 
 # --- Rutas para servir las Vistas del Frontend ---
 

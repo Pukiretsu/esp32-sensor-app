@@ -27,6 +27,7 @@ COPY . .
 # Este es el puerto interno del contenedor, no el puerto del host
 EXPOSE 8000
 
+RUN cd app
 # Define el comando para ejecutar la aplicación Uvicorn
 # 0.0.0.0 permite que la aplicación sea accesible desde cualquier interfaz de red dentro del contenedor
 # main:app se refiere al objeto 'app' en el archivo 'main.py'
