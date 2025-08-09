@@ -143,51 +143,63 @@ $(document).ready(function () {
     // Función para cargar y mostrar la lista de controladores
     function loadControllers() {
         $.get(API_ADDR + '/controladores/', function (data) {
-            const controllersListDiv = $('#controladores-list');
-            controllersListDiv.empty(); // Limpiar la lista existente
+            const tbody = $('#controladores-table-body');
+            tbody.empty();
 
             if (data.length > 0) {
                 data.forEach(controller => {
-                    const controllerCard = `
-                        <div class="sensor-card controller-card" data-uuid="${controller.uuid_controlador}">
-                            <span class="material-symbols-outlined sensor-icon">developer_board</span>
-                            <h3>${controller.nombre_controlador}</h3>
-                            <p>UUID: ${controller.uuid_controlador}</p>
-                            <p>Registrado: ${formatIsoDateForDisplay(controller.timestamp_registro)}</p>
-                            <button class="btn btn-primary view-data-btn" data-uuid="${controller.uuid_controlador}" data-name="${controller.nombre_controlador}">
-                                Ver Datos
-                            </button>
-                            <button class="btn btn-danger delete-controller-btn" data-uuid="${controller.uuid_controlador}">
-                                <span class="material-symbols-outlined">delete</span>
-                                Eliminar
-                            </button>
-                        </div>
-                    `;
-                    controllersListDiv.append(controllerCard);
+                    const row = $(`
+                        <tr>
+                            <td>${controller.nombre_controlador}</td>
+                            <td>${controller.uuid_controlador}</td>
+                            <td>${formatIsoDateForDisplay(controller.timestamp_registro)}</td>
+                            <td class="actions">
+                                <button class="btn btn-primary btn-sm show-ensayos-btn" data-uuid="${controller.uuid_controlador}" data-name="${controller.nombre_controlador}">
+                                    <span class="material-symbols-outlined">visibility</span>
+                                </button>
+                                <button class="btn btn-primary btn-sm edit-controller-btn" data-uuid="${controller.uuid_controlador}">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                <button class="btn btn-danger btn-sm delete-controller-btn" data-uuid="${controller.uuid_controlador}">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </td>
+                        </tr>
+                    `);
+                    tbody.append(row);
                 });
 
-                // Añadir event listeners a los botones "Ver Datos"
-                $('.view-data-btn').on('click', function () {
+                // Eventos:
+                $('.show-ensayos-btn').on('click', function () {
                     const uuid = $(this).data('uuid');
                     const name = $(this).data('name');
+                    history.pushState(null, '', '?uuid_controlador=' + uuid); // Cambiar URL
                     selectController(uuid, name);
+                    // Ocultar tabla de controladores
+                    $('#controladores-list').hide();
                 });
 
-                // Añadir event listeners a los botones "Eliminar Controlador"
-                $('.delete-controller-btn').on('click', function (e) {
-                    e.stopPropagation(); // Evitar que el clic en eliminar active "Ver Datos"
+                $('.delete-controller-btn').on('click', function () {
                     const uuid = $(this).data('uuid');
-                    if (confirm(`¿Estás seguro de que quieres eliminar el controlador con UUID: ${uuid}? Esto eliminará también todos los ensayos y lecturas asociadas.`)) {
+                    if (confirm('¿Eliminar este controlador?')) {
                         deleteController(uuid);
                     }
                 });
 
+                $('.edit-controller-btn').on('click', function () {
+                    const uuid = $(this).data('uuid');
+                    const newName = prompt('Nuevo nombre del controlador:');
+                    if (newName) {
+                        renameController(uuid, newName);
+                    }
+                });
+
             } else {
-                controllersListDiv.append('<p>No hay controladores registrados aún.</p>');
+                tbody.append('<tr><td colspan="4">No hay controladores registrados aún.</td></tr>');
             }
         }).fail(function () {
-            console.error("Error al cargar la lista de controladores.");
-            $('#controladores-list').html('<p>Error al cargar controladores. Intenta refrescar la página.</p>');
+            console.error("Error al cargar controladores.");
+            $('#controladores-table-body').html('<tr><td colspan="4">Error al cargar controladores.</td></tr>');
         });
     }
 
@@ -206,6 +218,23 @@ $(document).ready(function () {
             error: function (jqXHR, textStatus, errorThrown) {
                 console.error("Error al registrar controlador:", jqXHR.responseJSON || errorThrown);
                 alert('Error al registrar controlador: ' + (jqXHR.responseJSON ? jqXHR.responseJSON.detail : errorThrown));
+            }
+        });
+    }
+
+    // Funciòn para renombrar los controladores
+    function renameController(uuid, newName) {
+        $.ajax({
+            url: API_ADDR + '/controladores/' + uuid,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ nombre_controlador: newName }),
+            success: function () {
+                alert('Nombre actualizado.');
+                loadControllers();
+            },
+            error: function () {
+                alert('Error al actualizar nombre.');
             }
         });
     }
@@ -320,6 +349,7 @@ $(document).ready(function () {
 
     // Función para seleccionar un controlador y mostrar sus datos y ensayos
     function selectController(uuid, name) {
+        $('#back-to-controllers-btn').show();
         currentControllerUuid = uuid;
         currentEnsayoUuid = null; // Resetear el ensayo seleccionado al cambiar de controlador
 

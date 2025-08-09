@@ -761,3 +761,7 @@ tbody tr:hover {
     color: #1f2937;
     padding: 10px; /* Más padding para las opciones */
 }
+
+td.actions {
+    display: flex;
+}
